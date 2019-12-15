@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.cz.widget.supertextview.sample">
+
+    <application
+        android:name=".SampleApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".extension.SelectTextActivity"></activity>
+        <activity
+            android:name=".version1.TextLayoutSample3Activity"
+            android:label="@string/title_activity_text_layout_sample3"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".version1.TextLayoutSample2Activity" />
+        <activity
+            android:name=".version1.TextLayoutSample1Activity"
+            android:label="@string/title_activity_text_layout_sample1"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

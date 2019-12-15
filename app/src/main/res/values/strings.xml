@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">SuperTextView</string>
+    <string name="title_activity_text_layout_sample1">TextLayoutSample1Activity</string>
+    <string name="operation_panel">操作面板</string>
+    <string-array name="spanArray">
+        <item>View</item>
+        <item>图片</item>
+        <item>背景</item>
+        <item>相对大小</item>
+        <item>修饰效果</item>
+        <item>浮雕</item>
+        <item>中划线</item>
+        <item>下划线</item>
+        <item>绝对大小</item>
+        <item>x轴缩放</item>
+        <item>x轴缩放</item>
+        <item>字体样式</item>
+    </string-array>
+
+    <string-array name="layoutMode">
+        <item>默认</item>
+        <item>段落</item>
+        <item>段落换行</item>
+        <item>换行</item>
+        <item>超出换行</item>
+        <item>超出换行</item>
+        <item>跟随占满</item>
+        <item>独占一行</item>
+    </string-array>
+    <string name="title_activity_text_layout_sample3">TextLayoutSample3Activity</string>
+    <string name="data_init">数据初始化中</string>
+    <string name="data_init_message">初始化过程中,会随机添加一批样式</string>
+
+</resources>

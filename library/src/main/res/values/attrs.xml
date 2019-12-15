@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TextLayout">
+        <!--子控件排版约束策略-->
+        <attr name="layout_mode" format="enum">
+            <!--跟随内容向右流动-->
+            <enum name="flow" value="0x01"/>
+            <!--标记为一个段落-->
+            <enum name="paragraph" value="0x0A"/>
+            <!--断行,并标记为一个段落-->
+            <enum name="paragraph_break_line" value="0x06"/>
+            <!--换行-->
+            <enum name="break_line" value="0x04"/>
+            <!--检测元素排版后是否超出范围,如果超出换到下一行-->
+            <enum name="consider_break_line" value="0x09"/>
+            <!--跟随内容,排版后换行-->
+            <enum name="flow_single_line" value="0x15"/>
+            <!--换行,排版后再换行-->
+            <enum name="single_line" value="0x14"/>
+        </attr>
+        <attr name="layout_align" format="enum">
+            <!--行内容顶部靠齐-->
+            <enum name="top" value="0x00"/>
+            <!--行内容居中靠齐-->
+            <enum name="center" value="0x01"/>
+            <!--行内容居底部靠齐-->
+            <enum name="bottom" value="0x02"/>
+        </attr>
+    </declare-styleable>
+</resources>

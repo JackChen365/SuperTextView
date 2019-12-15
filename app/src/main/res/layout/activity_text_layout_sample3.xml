@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.cz.widget.supertextview.library.view.RecyclerTextLayout
+        android:id="@+id/textLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="64dp"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="right|bottom"
+        android:gravity="right"
+        android:layout_margin="4dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/copyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="Copy"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/randomButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="Random"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</FrameLayout>
