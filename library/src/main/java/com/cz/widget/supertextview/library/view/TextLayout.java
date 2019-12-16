@@ -16,9 +16,13 @@ import android.view.ViewGroup;
 import androidx.annotation.RequiresApi;
 
 import com.cz.widget.supertextview.library.R;
+import com.cz.widget.supertextview.library.decoration.DefaultLineDecoration;
+import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.layout.Layout;
 import com.cz.widget.supertextview.library.layout.StaticLayout;
+import com.cz.widget.supertextview.library.render.Callback;
 import com.cz.widget.supertextview.library.render.DefaultTextRender;
+import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.span.ViewSpan;
 import com.cz.widget.supertextview.library.spannable.SpannableString;
 
@@ -34,7 +38,7 @@ import com.cz.widget.supertextview.library.spannable.SpannableString;
  * 2. 优化渲染
  * 3. 优化动态修改
  */
-public class TextLayout extends ViewGroup {
+public class TextLayout extends ViewGroup implements Callback {
     private static final String TAG="TextLayout";
     /**
      * 绘制文本画笔对象
@@ -48,6 +52,12 @@ public class TextLayout extends ViewGroup {
      * 文本排版layout对象
      */
     private Layout layout;
+    /**
+     * 文本渲染器
+     */
+    private TextRender textRender=new DefaultTextRender();
+    //行装饰器
+    private LineDecoration lineDecoration=new DefaultLineDecoration();
 
     public TextLayout(Context context) {
         this(context,null,0);
@@ -92,6 +102,19 @@ public class TextLayout extends ViewGroup {
         requestLayout();
     }
 
+    /**
+     * 设置行装饰器
+     * @param lineDecoration
+     */
+    public void setLineDecoration(LineDecoration lineDecoration){
+        this.lineDecoration=lineDecoration;
+    }
+
+    public void setTextRender(TextRender textRender){
+        textRender.setCallback(this);
+        this.textRender=textRender;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -100,7 +123,7 @@ public class TextLayout extends ViewGroup {
         //初始化Layout
         int measuredWidth = getMeasuredWidth();
         if(null!=text&&(null==layout||text!=layout.getText())){
-            layout = new StaticLayout(text, textPaint, new DefaultTextRender(),measuredWidth - getPaddingLeft() - getPaddingRight(), 0f, Gravity.CENTER);
+            layout = new StaticLayout(text, textPaint,lineDecoration ,textRender,measuredWidth - getPaddingLeft() - getPaddingRight(), 0f, Gravity.CENTER);
         }
         //重新设置尺寸
         if(null!=layout){

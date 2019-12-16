@@ -1,17 +1,21 @@
 package com.cz.widget.supertextview.library.layout;
 
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 
 import com.cz.widget.supertextview.library.Styled;
+import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.paragraph.ParagraphLayoutInfo;
 import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.span.ViewSpan;
 import com.cz.widget.supertextview.library.style.MetricAffectingSpan;
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
+import com.cz.widget.supertextview.library.text.TextParagraph;
 import com.cz.widget.supertextview.library.utils.ArrayUtils;
 import com.cz.widget.supertextview.library.utils.TextUtilsCompat;
 
@@ -32,6 +36,7 @@ public class StaticLayout extends Layout {
     private static final int BOTTOM=4;//文本底部位置,因为存在一行内,多行信息
     private static final int ALIGN = 5;//文本对齐标志
     private static final int START_MASK = 0x1FFFFFFF;
+    private static final Rect decorationTmpRect =new Rect();
 
     private int lineCount;
     private int columns;
@@ -40,15 +45,18 @@ public class StaticLayout extends Layout {
     private char[] charArrays;
     private float[] widths;
     private Paint.FontMetricsInt fontMetricsInt;
+    //行装饰器
+    private LineDecoration lineDecoration;
     /**
      * @param source      操作文本
      * @param paint      绘制paint
      * @param width      排版宽
      * @param spacingAdd 行额外添加空间
      */
-    public StaticLayout(CharSequence source, TextPaint paint, TextRender textRender, int width, float spacingAdd, int align) {
+    public StaticLayout(CharSequence source, TextPaint paint, LineDecoration lineDecoration,
+                        TextRender textRender, int width, float spacingAdd, int align) {
         super(source,paint,textRender, width, spacingAdd);
-
+        this.lineDecoration=lineDecoration;
         columns = COLUMNS_NORMAL;
         fontMetricsInt = new Paint.FontMetricsInt();
         lines = new int[ArrayUtils.idealIntArraySize(2 * columns)];
@@ -59,11 +67,8 @@ public class StaticLayout extends Layout {
     }
 
     void generate(CharSequence source, int bufferStart, int bufferEnd,
-                  TextPaint paint, int outerWidth,float spacingadd,int align) {
+                  TextPaint paint, int outerWidth,float spacingAdd,int align) {
         lineCount = 0;
-
-        float v = 0;
-
         Paint.FontMetricsInt fm = fontMetricsInt;
         int end = TextUtilsCompat.indexOf(source, '\n', bufferStart, bufferEnd);
         int bufsiz = end >= 0 ? end - bufferStart : bufferEnd - bufferStart;
@@ -75,7 +80,8 @@ public class StaticLayout extends Layout {
         }
         char[] chs = charArrays;
         float[] widths = this.widths;
-
+        int paragraph=0;
+        int paragraphLine=0;
         Spanned spanned = null;
         if (source instanceof Spanned)
             spanned = (Spanned) source;
@@ -87,8 +93,6 @@ public class StaticLayout extends Layout {
 
             if (end < 0)
                 end = bufferEnd;
-            else
-                end++;
             int firstWidth = outerWidth;
 
             if (end - start > chs.length) {
@@ -101,24 +105,17 @@ public class StaticLayout extends Layout {
             }
 
             TextUtilsCompat.getChars(source, start, end, chs, 0);
-
-            if (source instanceof Spanned) {
-                Spanned sp = (Spanned) source;
-                ReplacementSpan[] spans = sp.getSpans(start, end, ReplacementSpan.class);
-                //减少ReplacementSpan运算
-                for (int y = 0; y < spans.length; y++) {
-                    int a = sp.getSpanStart(spans[y]);
-                    int b = sp.getSpanEnd(spans[y]);
-                    for (int x = a; x < b; x++) {
-                        chs[x - start] = '\uFFFC';
-                    }
-                }
-            }
+            //        setReplacementSpanWord(source,start,end,chs);
             CharSequence sub = source;
 
             int width = firstWidth;
-
-            float w = 0;
+            int lineLayoutMode = ReplacementSpan.FLOW;
+            //段落排版信息
+            ParagraphLayoutInfo paragraphLayoutInfo = new ParagraphLayoutInfo();
+            //获得行偏移
+            lineDecoration.getLineOffsets(paragraph, paragraphLine, decorationTmpRect);
+            float w = decorationTmpRect.left;
+            int v = 0;
             int here = start;
 
             int ok = start;
@@ -126,11 +123,7 @@ public class StaticLayout extends Layout {
 
             int fit = start;
             int fitascent = 0, fitdescent = 0, fittop = 0, fitbottom = 0;
-            int next=0;
-
-            int lineLayoutMode=ReplacementSpan.FLOW;
-            //段落信息
-            ParagraphLayoutInfo paragraphLayoutInfo =new ParagraphLayoutInfo();
+            int next = 0;
             for (int i = start; i < end; i = next) {
                 if (spanned == null)
                     next = end;
@@ -144,52 +137,89 @@ public class StaticLayout extends Layout {
                 } else {
                     workPaint.baselineShift = 0;
                     ReplacementSpan replacementSpan = findReplacementSpan(i, next);
-                    if(null!=replacementSpan){
-                        lineLayoutMode=replacementSpan.getSpanLayoutMode();
+                    if (null != replacementSpan) {
+                        lineLayoutMode = replacementSpan.getSpanLayoutMode();
                         // 如果当前大小排版超出范围,则换到下一行
-                        int replacementSpanWidth = replacementSpan.getSize(paint, source.subSequence(i,next), i, next, paragraphLayoutInfo.paragraphFontMetrics);
+                        int replacementSpanWidth = replacementSpan.getSize(paint, source.subSequence(i, next), i, next, paragraphLayoutInfo.paragraphFontMetrics);
                         int replacementSpanHeight = paragraphLayoutInfo.paragraphFontMetrics.bottom - paragraphLayoutInfo.paragraphFontMetrics.top;
+                        int decorationHeight = decorationTmpRect.top + decorationTmpRect.bottom;
                         //换行条件
                         //1. 元素设置为换行
                         //2. 元素设置为超出宽度换行
                         //3. 段落内,且长度高于段落换行
-                        if(ReplacementSpan.isBreakLine(lineLayoutMode)||
-                                ReplacementSpan.considerBreakLine(lineLayoutMode)&&(w+replacementSpanWidth)>outerWidth||
-                                paragraphLayoutInfo.inParagraph&&(v+replacementSpanHeight)> paragraphLayoutInfo.paragraphHeight){
-                            //检测新的元素是否为段落
-                            if(paragraphLayoutInfo.inParagraph){
-                                w = paragraphLayoutInfo.paragraphLeftOffset;
+                        if (ReplacementSpan.isBreakLine(lineLayoutMode) ||
+                                ReplacementSpan.considerBreakLine(lineLayoutMode) && (w + replacementSpanWidth) > outerWidth ||
+                                paragraphLayoutInfo.inParagraph && (v + decorationHeight + replacementSpanHeight) > paragraphLayoutInfo.paragraphHeight) {
+                            if (paragraphLayoutInfo.inParagraph) {
+                                w = decorationTmpRect.left + paragraphLayoutInfo.paragraphLeftOffset;
                             } else {
-                                w = 0;
+                                w = decorationTmpRect.left;
                             }
                             //输出上一行信息
-                            out(paragraphLayoutInfo,here, i-1, fitascent, fitdescent,w, v,spacingadd,align);
-                            v += (fitdescent - fitascent + spacingadd);
+                            v += decorationTmpRect.top;
+                            out(paragraphLayoutInfo,source, here, i, fitascent, fitdescent, w, v, spacingAdd, align, decorationTmpRect);
+                            v += (fitdescent - fitascent  + decorationTmpRect.bottom);
                             //段落宽度/高度超出,切换到章节段落下
-                            if(paragraphLayoutInfo.inParagraph && (v+replacementSpanHeight> paragraphLayoutInfo.paragraphHeight) ||
-                                    ReplacementSpan.considerBreakLine(lineLayoutMode)&&(w+replacementSpanWidth)>outerWidth){
-                                w = 0;
-                                v += (paragraphLayoutInfo.paragraphHeight-v);
+                            if (paragraphLayoutInfo.inParagraph && (v + decorationHeight + replacementSpanHeight > paragraphLayoutInfo.paragraphHeight) ||
+                                    ReplacementSpan.considerBreakLine(lineLayoutMode) && (w + replacementSpanWidth) > outerWidth) {
+                                w = decorationTmpRect.left;
+                                v += (paragraphLayoutInfo.paragraphHeight - v) + decorationTmpRect.bottom;
                                 paragraphLayoutInfo.reset();
+                                decorationTmpRect.setEmpty();
                             }
                             fitascent = fitdescent = fittop = fitbottom = 0;
                             okascent = okdescent = oktop = okbottom = 0;
-                            here = next-1;
+                            here = i;
                             ok = here;
                         }
-                        layoutViewSpan(replacementSpan, w,v);
-                        if(ReplacementSpan.isParagraph(lineLayoutMode)){
+                        //排版控件span
+                        if (ReplacementSpan.isParagraph(lineLayoutMode)) {
+                            //如果当前行信息，加上控件宽度超出，输出上一行信息
+                            if (here != fit && w + replacementSpanWidth + decorationTmpRect.left + decorationTmpRect.right > outerWidth) {
+                                float left = decorationTmpRect.left + paragraphLayoutInfo.paragraphLeftOffset;
+                                v += decorationTmpRect.top;
+                                out(paragraphLayoutInfo,source, here, i, fitascent, fitdescent, left, v, spacingAdd, align, decorationTmpRect);
+                                v += (fitdescent - fitascent  + decorationTmpRect.bottom);
+                                lineDecoration.getLineOffsets(paragraph, paragraphLine, decorationTmpRect);
+                                w = decorationTmpRect.left;
+                                here = i;
+                            }
                             //计算段落信息的FontMetrics对象
                             Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, paragraphLayoutInfo.paragraphFontMetrics);
+                            Paint.FontMetricsInt paragraphFontMetrics = paragraphLayoutInfo.paragraphFontMetrics;
+                            //如果不为空代表嵌套段落
+                            if (!paragraphLayoutInfo.inParagraph) {
+                                lineDecoration.getLineOffsets(paragraph, paragraphLine, decorationTmpRect);
+                                w += decorationTmpRect.left;
+                                v += decorationTmpRect.top;
+                            }
+                            //运算段落边距
+                            //如果当前行信息，加上控件宽度超出没有超出，将此行输出为段落内
+                            if (here != fit) {
+                                float left = decorationTmpRect.left + paragraphLayoutInfo.paragraphLeftOffset;
+                                out(paragraphLayoutInfo,source, here, i, fitascent, fitdescent, left, v, spacingAdd, align, decorationTmpRect);
+                                here = i;
+                            }
                             //输出行信息
-                            out(paragraphLayoutInfo,here, i, fitascent, fitdescent,0, v,spacingadd,align);
+                            out(paragraphLayoutInfo,source, here, next, paragraphFontMetrics.ascent, paragraphFontMetrics.descent, w, v, spacingAdd, align, decorationTmpRect);
+                            layoutViewSpan(replacementSpan, w, v);
                             here = next;
                             ok = here;
                         } else {
+                            layoutViewSpan(replacementSpan, w, v);
                             Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, fm);
                         }
                     } else {
                         Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, fm);
+                        //检测段落内常规元素超出
+                        int decorationHeight = decorationTmpRect.top + decorationTmpRect.bottom;
+                        if (paragraphLayoutInfo.inParagraph && (v + decorationHeight + (fm.descent - fm.ascent) > paragraphLayoutInfo.paragraphHeight)) {
+                            //这里最后一行,某一个元素高度超出,所以回退
+                            w -= paragraphLayoutInfo.paragraphLeftOffset;
+                            v += (paragraphLayoutInfo.paragraphHeight - v) + decorationTmpRect.bottom;
+                            paragraphLayoutInfo.reset();
+                            decorationTmpRect.setEmpty();
+                        }
                     }
                     System.arraycopy(widths, 0, widths, end - start + (i - start), next - i);
                     if (workPaint.baselineShift < 0) {
@@ -211,8 +241,7 @@ public class StaticLayout extends Layout {
                     } else {
                         w += widths[j - start + (end - start)];
                     }
-//                    &&!ReplacementSpan.isBreakLine(lineLayoutMode)
-                    if (w <= width) {
+                    if (w <= width - decorationTmpRect.right) {
                         fit = j + 1;
 
                         if (fmTop < fittop)
@@ -242,62 +271,92 @@ public class StaticLayout extends Layout {
                         }
                     } else {
                         //如果在段落内,高度
-                        float x= paragraphLayoutInfo.paragraphLeftOffset;
+                        float x = decorationTmpRect.left + paragraphLayoutInfo.paragraphLeftOffset;
+                        v += decorationTmpRect.top;
                         if (ok != here) {
                             //这里是一行
-                            out(paragraphLayoutInfo,here, ok, okascent, okdescent,x,v,spacingadd,align);
-                            v += (okdescent - okascent + spacingadd);
+                            out(paragraphLayoutInfo,source, here, ok, okascent, okdescent, x, v, spacingAdd, align, decorationTmpRect);
+                            v += (okdescent - okascent + decorationTmpRect.bottom);
+                            if (paragraphLayoutInfo.inParagraph) {
+//                                lineDecoration.getParagraphLineOffsets(paragraph.textParagraph, paragraph.lineCount, decorationTmpRect);
+                            } else {
+                                lineDecoration.getLineOffsets(paragraph, paragraphLine, decorationTmpRect);
+                            }
                             here = ok;
                         } else if (fit != here) {
-                            out(paragraphLayoutInfo,here, fit, fitascent, fitdescent,x,v,spacingadd,align);
-                            v += (fitdescent - fitascent + spacingadd);
+                            out(paragraphLayoutInfo,source, here, fit, fitascent, fitdescent, x, v, spacingAdd, align, decorationTmpRect);
+                            v += (fitdescent - fitascent + spacingAdd + decorationTmpRect.bottom);
+                            if (paragraphLayoutInfo.inParagraph) {
+//                                lineDecoration.getParagraphLineOffsets(paragraph.textParagraph, paragraph.lineCount, decorationTmpRect);
+                            } else {
+                                lineDecoration.getLineOffsets(paragraph, paragraphLine, decorationTmpRect);
+                            }
                             here = fit;
                         } else {
                             //跳过此行,当前空间不够
-                            if(paragraphLayoutInfo.inParagraph){
-                                v += (paragraphLayoutInfo.paragraphHeight-v);
+                            if (paragraphLayoutInfo.inParagraph) {
+                                v += (paragraphLayoutInfo.paragraphHeight - v);
                             } else {
-                                v += (fitdescent - fitascent + spacingadd);
+                                v += (fitdescent - fitascent + spacingAdd + decorationTmpRect.bottom);
                             }
-                            here+=1;
+                            here = here + 1;
                         }
                         if (here < i) {
                             j = next = here; // must remeasure
                         } else {
                             j = here - 1;    // continue looping
                         }
-                        ok = here;
-                        w = 0;
                         fitascent = fitdescent = fittop = fitbottom = 0;
                         okascent = okdescent = oktop = okbottom = 0;
-                        if(paragraphLayoutInfo.inParagraph){
+                        ok = here;
+                        w = decorationTmpRect.left;
+                        if (paragraphLayoutInfo.inParagraph) {
                             //段落结束
-                            w = paragraphLayoutInfo.paragraphLeftOffset;
-                            if(v+(fmDescent-fmAscent)+spacingadd>= paragraphLayoutInfo.paragraphHeight){
-                                w=0;
-                                v+=(paragraphLayoutInfo.paragraphHeight-v);
+                            w = decorationTmpRect.left + paragraphLayoutInfo.paragraphLeftOffset;
+                            int decorationHeight = decorationTmpRect.top + decorationTmpRect.bottom;
+                            if (v + decorationHeight + (fmDescent - fmAscent) + spacingAdd >= paragraphLayoutInfo.paragraphHeight) {
+                                //段落清除，重新运算行信息
+                                v += (paragraphLayoutInfo.paragraphHeight - v) + decorationTmpRect.bottom;
+                                lineDecoration.getLineOffsets(paragraph, paragraphLine, decorationTmpRect);
+                                //清除数据
+                                w = decorationTmpRect.left;
                                 paragraphLayoutInfo.reset();
                             }
                         }
                     }
                 }
                 //设置段落信息
-                if(ReplacementSpan.isParagraph(lineLayoutMode)){
-                    paragraphLayoutInfo.inParagraph=true;
-                    paragraphLayoutInfo.paragraphLeftOffset=w;
-                    paragraphLayoutInfo.paragraphHeight=v+(paragraphLayoutInfo.paragraphFontMetrics.descent- paragraphLayoutInfo.paragraphFontMetrics.ascent);
+                if (ReplacementSpan.isParagraph(lineLayoutMode)) {
+                    //初始化段落信息
+                    paragraphLayoutInfo.inParagraph = true;
+                    paragraphLayoutInfo.paragraphLeftOffset = w;
+                    paragraphLayoutInfo.paragraphHeight = v + (paragraphLayoutInfo.paragraphFontMetrics.descent - paragraphLayoutInfo.paragraphFontMetrics.ascent);
                     lineLayoutMode = ReplacementSpan.FLOW;
                 }
             }
-            //处理最后一行元素信息
             if (end != here) {
-                float x = !paragraphLayoutInfo.inParagraph ? 0 : paragraphLayoutInfo.paragraphLeftOffset;
-                out(paragraphLayoutInfo,here, end, fitascent, fitdescent,x, v,spacingadd,align);
-                v += (fitdescent - fitascent + spacingadd);
+                //处理断行内容
+                float x = !paragraphLayoutInfo.inParagraph
+                        ? 0 + decorationTmpRect.left : paragraphLayoutInfo.paragraphLeftOffset + decorationTmpRect.left;
+                v += decorationTmpRect.top;
+                out(paragraphLayoutInfo,source, here, end, fitascent, fitdescent, x, v, spacingAdd, align, decorationTmpRect);
+            } else if (start == end && '\n' == source.charAt(end - 1)) {
+                //最后以换行结尾
+                v += decorationTmpRect.top;
+                out(paragraphLayoutInfo,source, here, end, fm.ascent, fm.descent, 0, v, spacingAdd, align, decorationTmpRect);
             }
             if (end == bufferEnd)
                 break;
         }
+    }
+
+
+    /**
+     * 设置行装饰器
+     * @param lineDecoration
+     */
+    public void setLineDecoration(LineDecoration lineDecoration){
+        this.lineDecoration=lineDecoration;
     }
 
     /**
@@ -324,21 +383,40 @@ public class StaticLayout extends Layout {
      */
     private void layoutViewSpan(ReplacementSpan replacementSpan,float left,float top) {
         //排版view
-        if(replacementSpan instanceof ViewSpan){
+        if(null!=replacementSpan&&replacementSpan instanceof ViewSpan){
             ViewSpan viewSpan = (ViewSpan) replacementSpan;
-            View view = viewSpan.getView();
-            View parentView = (View)view.getParent();
-            int paddingLeft = parentView.getPaddingLeft();
-            int paddingTop = parentView.getPaddingTop();
-            view.layout((int) (paddingLeft+left),
-                    (int)(paddingTop+top),
-                    (int) (paddingLeft+left+view.getMeasuredWidth()),
-                    (int) (paddingTop+top+view.getMeasuredHeight()));
+            viewSpan.setLayoutLeft((int) left);
+            viewSpan.setLayoutTop((int) top);
+        }
+    }
+
+    /**
+     *  装载ViewSpan
+     */
+    private void attachViewSpan(CharSequence source, int start, int end, int top, int bottom, int align) {
+        //排版view
+        if(source instanceof Spanned){
+            Spanned spanned = (Spanned) source;
+            ViewSpan[] viewSpans = spanned.getSpans(start, end, ViewSpan.class);
+            for(int i=0;i<viewSpans.length;i++){
+                ViewSpan viewSpan = viewSpans[i];
+                //根据方向重置排版top偏移
+                int viewHeight = viewSpan.getHeight();
+                if(Gravity.TOP==align){
+                    viewSpan.setLayoutTop(top);
+                } else if(Gravity.CENTER==align){
+                    int lineHeight=bottom-top;
+                    viewSpan.setLayoutTop(top+(lineHeight-viewHeight)/2);
+                } else if(Gravity.BOTTOM==align){
+                    viewSpan.setLayoutTop(top+bottom-viewHeight);
+                }
+                viewSpan.attachToView();
+            }
         }
     }
 
 
-    private void out(ParagraphLayoutInfo paragraphLayoutInfo, int start, int end, int above, int below, float x, float v, float extra, int align) {
+    private void out(ParagraphLayoutInfo paragraphLayoutInfo,CharSequence source, int start, int end, int above, int below, float x, float v, float extra, int align,Rect tmpRect) {
         int j = lineCount;
         int off = j * columns;
         int want = off + columns + TOP;
@@ -367,12 +445,8 @@ public class StaticLayout extends Layout {
         } else {
             lines[off + columns + TOP] = (int)(v+lineHeight);
         }
-        int lineLatterStart = getLineLatterStart(lineCount);
-        int lineLatterEnd = getLineLatterEnd(lineCount);
-        int lineStart = getLineStart(lineCount);
-        int lineTop = getDecoratedScrollLineTop(lineCount);
-        int lineBottom = getDecoratedScrollLineBottom(lineCount);
-        Log.e(TAG,"lineCount:"+lineCount+" lineLatterStart:"+lineLatterStart+" lineLatterEnd:"+lineLatterEnd+" lineStart:"+lineStart+" lineTop:"+lineTop+" lineBottom:"+(lineBottom));
+        //检测该范围内是否有子控件,有的话装载
+        attachViewSpan(source,start,end,lines[off + TOP],lines[off + BOTTOM],align);
         lineCount++;
     }
 

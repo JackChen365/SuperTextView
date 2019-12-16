@@ -98,15 +98,21 @@ class TextLayoutSample3Activity : ToolBarActivity() {
 //        if(null!=textSpan){
 //            spannableString.setSpan(textSpan, lineStart, lineStart+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 //        }
-//        val text="Feta Geitost Swiss Bel Paese Cotherstone Airag Metton (Cancoillotte)"
+//        val length = text.length
+
+//        Hereford Hop Siraz Nantais Manouri Schloss Mozzarella di Bufala Greuilh Grana Padano Northumberland Queso del Montsec Lajta Abertam Tourmalet Button (Innes) Tete de Moine Cabrales Queso Iberico Baylough Shropshire Blue Trappe (Veritable) Casciotta di Urbino Valencay Ossau Fermier Sourire Lozerien Loch Arthur Farmhouse Shelburne Cheddar Leafield Cheddar Clothbound Queso Fresco (Adobera) Brin d'Amour Harbourne Blue Pate de Fromage
+//        [8, 12, 18, 26, 34, 42, 53, 56, 63, 71, 77, 84, 99, 105, 109, 117, 123, 131, 141, 148, 156, 161, 164, 170, 179, 185, 193, 202, 213, 218, 225, 237, 247, 250, 257, 266, 272, 280, 288, 297, 302, 309, 319, 329, 337, 346, 354, 365, 371, 378, 388, 393, 401, 411, 416, 421, 424]
+//        [4, 6, 11, 8, 4, 3, 5, 0, 12, 10, 3, 3, 9, 12, 8, 11, 11, 2, 6, 0, 7, 8, 1, 2, 1, 11, 8, 0, 2, 12, 2, 9, 8, 11, 1, 11, 2, 2, 3, 12, 1, 1, 1, 5, 7, 7, 2, 6, 11, 3, 2, 7, 6, 2, 7, 11, 4]
+
+
 //        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
 //
-//        val length = text.length
+////        val text="Button (Innes) Tete de Moine Cabrales Queso Iberico Baylough Shropshire Blue "
 //        val spannableString=SpannableString(text)
-//        //初始化span
+////        //初始化span
 //        val index=text.indexOf("\n")
-//        val positionList= mutableListOf(28, 45)
-//        val spanPositionList= mutableListOf(0, 0)
+//        val positionList= mutableListOf(8, 22)
+//        val spanPositionList= mutableListOf(0, 1)
 //        positionList.forEachIndexed { index, position->
 //            var textSpan = getTextSpan(spanPositionList[index])
 //            if(textSpan is ReplacementSpan){
@@ -117,6 +123,7 @@ class TextLayoutSample3Activity : ToolBarActivity() {
 //        }
 //        //更新布局
 //        textLayout.clear()
+//        textLayout.setLineDecoration(lineDecoration)
 //        textLayout.setText(spannableString)
 
 

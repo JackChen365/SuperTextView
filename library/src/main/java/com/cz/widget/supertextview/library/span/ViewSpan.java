@@ -29,11 +29,6 @@ public class ViewSpan extends ReplacementSpan {
      * 排版顶部位置,顶部位置,是被添加到缓冲区时决定
      */
     private int layoutTop;
-    /**
-     * 排版布局位置
-     */
-    private int lineLayoutTop;
-    private int topOffset;
 
     public ViewSpan(View view) {
         this.view = view;
@@ -81,7 +76,7 @@ public class ViewSpan extends ReplacementSpan {
         View parentView = (View)view.getParent();
         int paddingLeft = parentView.getPaddingLeft();
         int paddingTop = parentView.getPaddingTop();
-        int offsetTop=paddingTop+layoutTop+lineLayoutTop+ topOffset;
+        int offsetTop=paddingTop+layoutTop;
         view.layout(paddingLeft+layoutLeft, offsetTop,
                 paddingLeft+layoutLeft+view.getMeasuredWidth(),
                 offsetTop+view.getMeasuredHeight());
@@ -114,15 +109,6 @@ public class ViewSpan extends ReplacementSpan {
     public void setLayoutTop(int layoutTop){
         this.layoutTop=layoutTop;
     }
-
-    public void setTopOffset(int offset){
-        this.topOffset =offset;
-    }
-
-    public void setLineLayoutTop(int lineLayoutTop) {
-        this.lineLayoutTop = lineLayoutTop;
-    }
-
 
     @Override
     public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) {

@@ -4,10 +4,12 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.view.Gravity;
 
 import com.cz.widget.supertextview.library.Styled;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.render.TextRender;
+import com.cz.widget.supertextview.library.span.ViewSpan;
 
 /**
  * 文本行信息
@@ -270,6 +272,35 @@ public class TextLine {
     }
 
     /**
+     * 排版子控件
+     */
+    public void layoutViewSpan(CharSequence source,int left,int top) {
+        if(source instanceof Spanned){
+            Spanned spanned = (Spanned) source;
+            int newLineTop = getDecoratedScrollLineTop();
+            int newLineBottom = getDecoratedScrollLineBottom();
+            int newLineGravity = getLineAlign();
+            int newLineLatterStart = getLineStart();
+            int newLineLatterEnd = getLineEnd();
+            ViewSpan[] viewSpans = spanned.getSpans(newLineLatterStart, newLineLatterEnd, ViewSpan.class);
+            for(int i=0;i<viewSpans.length;i++){
+                ViewSpan viewSpan = viewSpans[i];
+                //根据方向重置排版top偏移
+                int viewHeight = viewSpan.getHeight();
+                if(Gravity.TOP==newLineGravity){
+                    viewSpan.setLayoutTop(top+newLineTop);
+                } else if(Gravity.CENTER==newLineGravity){
+                    int lineHeight=newLineBottom-newLineTop;
+                    viewSpan.setLayoutTop(top+newLineTop+(lineHeight-viewHeight)/2);
+                } else if(Gravity.BOTTOM==newLineGravity){
+                    viewSpan.setLayoutTop(top+newLineBottom-viewHeight);
+                }
+                viewSpan.attachToView();
+            }
+        }
+    }
+
+    /**
      * 绘制文本
      * @param canvas
      * @param text
@@ -292,4 +323,5 @@ public class TextLine {
             Styled.drawText(canvas, textRender,text, lineStart, lineEnd, lineLeft, top, baseline, bottom, paint, workPaint, lineAlign,false);
         }
     }
+
 }

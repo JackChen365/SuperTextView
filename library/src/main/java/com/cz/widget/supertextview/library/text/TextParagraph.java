@@ -1,10 +1,13 @@
 package com.cz.widget.supertextview.library.text;
 
 import android.graphics.Canvas;
+import android.text.Spanned;
 import android.text.TextPaint;
+import android.view.Gravity;
 
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.render.TextRender;
+import com.cz.widget.supertextview.library.span.ViewSpan;
 
 /**
  * 文本段落信息,可理解为多行信息汇总
@@ -66,6 +69,17 @@ public class TextParagraph extends TextLine{
                 TextLine textLine = textLines[i];
                 textLine.recycler();
             }
+        }
+    }
+
+    /**
+     * 排版子控件
+     */
+    public void layoutViewSpan(CharSequence source,int left,int top) {
+        int lineTop = getLineTop();
+        for(int i=0;i<lineCount;i++){
+            TextLine textLine = textLines[i];
+            textLine.layoutViewSpan(source,0,lineTop);
         }
     }
 

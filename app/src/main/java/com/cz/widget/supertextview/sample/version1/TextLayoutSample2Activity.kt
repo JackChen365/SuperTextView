@@ -15,6 +15,7 @@ import android.widget.Toast
 import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
 import com.cz.widget.supertextview.sample.R
+import com.cz.widget.supertextview.sample.linedecoration.HighlightLineDecoration
 import com.okay.sampletamplate.ToolBarActivity
 import com.okay.sampletamplate.data.DataProvider
 import kotlinx.android.synthetic.main.activity_text_layout_sample2.*
@@ -27,11 +28,13 @@ class TextLayoutSample2Activity : ToolBarActivity() {
         private const val SPAN_COUNT=13
     }
     private val output=StringBuilder()
+    private var lineDecoration: HighlightLineDecoration?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_text_layout_sample2)
         //点击设置不同的布局
+        lineDecoration=HighlightLineDecoration(this)
         createText()
         copyButton.setOnClickListener {
             val myClipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -55,7 +58,7 @@ class TextLayoutSample2Activity : ToolBarActivity() {
         val positionList= mutableListOf<Int>()
         val spanPositionList= mutableListOf<Int>()
         while(-1!=start){
-            val i=2+Random.nextInt(SPAN_COUNT)
+            val i=Random.nextInt(SPAN_COUNT)
             var index=text.indexOf(" ",start+1)
             if(-1!=index){
                 spanPositionList.add(i)
@@ -99,6 +102,7 @@ class TextLayoutSample2Activity : ToolBarActivity() {
 //        }
         //更新布局
         textLayout.clear()
+        textLayout.setLineDecoration(lineDecoration)
         textLayout.setText(spannableString)
     }
 
@@ -130,10 +134,10 @@ class TextLayoutSample2Activity : ToolBarActivity() {
                 val layout=layoutInflater.inflate(R.layout.progress_layout1, textLayout, false)
                 ViewSpan(layout)
             }
-            2->BackgroundColorSpan(Color.RED)
-            3->ForegroundColorSpan(Color.YELLOW)
-            4->RelativeSizeSpan(2f)
-            5->MaskFilterSpan(BlurMaskFilter(3f, BlurMaskFilter.Blur.OUTER))
+            2-> BackgroundColorSpan(Color.RED)
+            3-> ForegroundColorSpan(Color.YELLOW)
+            4-> RelativeSizeSpan(2f)
+            5-> MaskFilterSpan(BlurMaskFilter(3f, BlurMaskFilter.Blur.OUTER))
             6->MaskFilterSpan(EmbossMaskFilter(floatArrayOf(1f, 1f, 3f), 1.5f, 8f, 3f))
             7->StrikethroughSpan()
             8->UnderlineSpan()

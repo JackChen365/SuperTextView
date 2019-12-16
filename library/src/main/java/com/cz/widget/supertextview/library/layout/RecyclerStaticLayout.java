@@ -200,13 +200,14 @@ public class RecyclerStaticLayout extends Layout {
                             w = decorationTmpRect.left;
                         }
                         //输出上一行信息
+                        v+=decorationTmpRect.top;
                         outTextLine(paragraph,here, i, fitascent, fitdescent,w, v,spacingAdd,align, decorationTmpRect,true);
                         v += (fitdescent - fitascent + spacingAdd+ decorationTmpRect.bottom);
                         //段落宽度/高度超出,切换到章节段落下
                         if(paragraphLayoutInfo.inParagraph && (v+decorationHeight+replacementSpanHeight> paragraphLayoutInfo.paragraphHeight) ||
                                 ReplacementSpan.considerBreakLine(lineLayoutMode)&&(w+replacementSpanWidth)>outerWidth){
                             w = decorationTmpRect.left;
-                            v += (paragraphLayoutInfo.paragraphHeight-v);
+                            v += (paragraphLayoutInfo.paragraphHeight-v)+decorationTmpRect.bottom;
                             paragraph.textParagraph=null;
                             paragraphLayoutInfo.reset();
                             decorationTmpRect.setEmpty();
@@ -217,8 +218,17 @@ public class RecyclerStaticLayout extends Layout {
                         ok = here;
                     }
                     //排版控件span
-                    layoutViewSpan(paragraph,replacementSpan, w,v);
                     if(ReplacementSpan.isParagraph(lineLayoutMode)){
+                        //如果当前行信息，加上控件宽度超出，输出上一行信息
+                        if(here != fit && w+replacementSpanWidth+decorationTmpRect.left+decorationTmpRect.right>outerWidth){
+                            float left=decorationTmpRect.left+paragraphLayoutInfo.paragraphLeftOffset;
+                            v+= decorationTmpRect.top;
+                            outTextLine(paragraph,here, i, fitascent, fitdescent, left, v, spacingAdd,align, decorationTmpRect,true);
+                            v += (fitdescent - fitascent + spacingAdd + decorationTmpRect.bottom);
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                            w = decorationTmpRect.left;
+                            here = i;
+                        }
                         //计算段落信息的FontMetrics对象
                         Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, paragraphLayoutInfo.paragraphFontMetrics);
                         Paint.FontMetricsInt paragraphFontMetrics = paragraphLayoutInfo.paragraphFontMetrics;
@@ -226,30 +236,36 @@ public class RecyclerStaticLayout extends Layout {
                         paragraph.textLines = idealTextLinesArray(paragraph.textLines, paragraph.lineCount+1);
                         //如果不为空代表嵌套段落
                         if(null==paragraph.textParagraph){
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
                             TextParagraph textParagraph=new TextParagraph();
-                            lineDecoration.getParagraphLineOffsets(textParagraph,paragraph.lineCount, decorationTmpRect);
-                            w=decorationTmpRect.left;
+                            w += decorationTmpRect.left;
+                            v += decorationTmpRect.top;
                             textParagraph.setLineTop(v);
-                            float lineHeight= (paragraphFontMetrics.descent - paragraphFontMetrics.ascent) + spacingAdd;
-                            textParagraph.setLineDescent((int) (paragraphFontMetrics.descent + spacingAdd));
+                            float lineHeight= (paragraphFontMetrics.descent - paragraphFontMetrics.ascent);
+                            textParagraph.setLineDescent(paragraphFontMetrics.descent);
                             textParagraph.setLineBottom((int) (v+lineHeight));
                             textParagraph.setParagraphLine(paragraph.lineCount);
                             textParagraph.setParagraph(paragraph.index);
+                            textParagraph.setRect(decorationTmpRect.left,decorationTmpRect.top,decorationTmpRect.right,decorationTmpRect.bottom);
                             //记录初始段落信息
                             paragraph.textParagraph=textParagraph;
                             paragraph.textLines[paragraph.lineCount]=textParagraph;
                             paragraph.lineCount++;
                         }
-                        //输出上一行信息
+                        //运算段落边距
+                        //如果当前行信息，加上控件宽度超出没有超出，将此行输出为段落内
                         if(here != fit){
-                            outTextLine(paragraph,here, i, fitascent, fitdescent, paragraphLayoutInfo.paragraphLeftOffset, v, spacingAdd,align, decorationTmpRect,false);
+                            float left=decorationTmpRect.left+paragraphLayoutInfo.paragraphLeftOffset;
+                            outTextLine(paragraph,here, i, fitascent, fitdescent, left, v, spacingAdd,align, decorationTmpRect,false);
                             here = i;
                         }
                         //输出行信息
                         outTextLine(paragraph,here, next, paragraphFontMetrics.ascent, paragraphFontMetrics.descent, w, v,spacingAdd,align, decorationTmpRect,false);
+                        layoutViewSpan(paragraph,replacementSpan, w,v);
                         here = next;
                         ok = here;
                     } else {
+                        layoutViewSpan(paragraph,replacementSpan, w,v);
                         Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, fm);
                     }
                 } else {
@@ -259,7 +275,7 @@ public class RecyclerStaticLayout extends Layout {
                     if(paragraphLayoutInfo.inParagraph && (v+decorationHeight+(fm.descent-fm.ascent)> paragraphLayoutInfo.paragraphHeight)){
                         //这里最后一行,某一个元素高度超出,所以回退
                         w -= paragraphLayoutInfo.paragraphLeftOffset;
-                        v += (paragraphLayoutInfo.paragraphHeight-v);
+                        v += (paragraphLayoutInfo.paragraphHeight-v)+decorationTmpRect.bottom;
                         paragraph.textParagraph=null;
                         paragraphLayoutInfo.reset();
                         decorationTmpRect.setEmpty();
@@ -285,7 +301,7 @@ public class RecyclerStaticLayout extends Layout {
                 } else {
                     w += widths[j - start + (end - start)];
                 }
-                if (w <= width- decorationTmpRect.right) {
+                if (w <= width-decorationTmpRect.right) {
                     fit = j + 1;
 
                     if (fmTop < fittop)
@@ -321,12 +337,20 @@ public class RecyclerStaticLayout extends Layout {
                         //这里是一行
                         outTextLine(paragraph,here, ok, okascent, okdescent,x,v,spacingAdd,align, decorationTmpRect,true);
                         v += (okdescent - okascent + spacingAdd + decorationTmpRect.bottom);
-                        lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                        if(null!=paragraph.textParagraph){
+                            lineDecoration.getParagraphLineOffsets(paragraph.textParagraph,paragraph.lineCount, decorationTmpRect);
+                        } else {
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                        }
                         here = ok;
                     } else if (fit != here) {
                         outTextLine(paragraph,here, fit, fitascent, fitdescent,x,v,spacingAdd,align, decorationTmpRect,true);
                         v += (fitdescent - fitascent + spacingAdd + decorationTmpRect.bottom);
-                        lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                        if(null!=paragraph.textParagraph){
+                            lineDecoration.getParagraphLineOffsets(paragraph.textParagraph,paragraph.lineCount, decorationTmpRect);
+                        } else {
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                        }
                         here = fit;
                     } else {
                         //跳过此行,当前空间不够
@@ -351,8 +375,11 @@ public class RecyclerStaticLayout extends Layout {
                         w = decorationTmpRect.left+paragraphLayoutInfo.paragraphLeftOffset;
                         int decorationHeight= decorationTmpRect.top+decorationTmpRect.bottom;
                         if(v+decorationHeight+(fmDescent-fmAscent)+spacingAdd>= paragraphLayoutInfo.paragraphHeight){
+                            //段落清除，重新运算行信息
+                            v+=(paragraphLayoutInfo.paragraphHeight-v)+decorationTmpRect.bottom;
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                            //清除数据
                             w=decorationTmpRect.left;
-                            v+=(paragraphLayoutInfo.paragraphHeight-v);
                             paragraph.textParagraph=null;
                             paragraphLayoutInfo.reset();
                         }
@@ -403,7 +430,7 @@ public class RecyclerStaticLayout extends Layout {
         if(null!=paragraph.textParagraph){
             //处在一个段落内
             TextParagraph textParagraph = paragraph.textParagraph;
-            float y=v-textParagraph.getLineTop();
+            float y=v-textParagraph.getLineTop()+decorationTmpRect.top;
             textParagraph.setLineDecoration(lineDecoration);
             textParagraph.textLines = out(paragraph,textParagraph.textLines,textParagraph.lineCount, start, end, above, below, (int) x,y, extra, align,tmpRect,isBreakLine);
             textParagraph.lineCount++;
@@ -803,29 +830,8 @@ public class RecyclerStaticLayout extends Layout {
      * 填空指定行信息
      */
     protected void onNewTextLineFilled(TextLine textLine){
-        if(source instanceof Spanned){
-            int newLineTop = textLine.getDecoratedScrollLineTop();
-            int newLineBottom = textLine.getDecoratedScrollLineBottom();
-            int newLineGravity = textLine.getLineAlign();
-            int newLineLatterStart = textLine.getLineStart();
-            int newLineLatterEnd = textLine.getLineEnd();
-            Spanned spanned = (Spanned) this.source;
-            ViewSpan[] viewSpans = spanned.getSpans(newLineLatterStart, newLineLatterEnd, ViewSpan.class);
-            for(int i=0;i<viewSpans.length;i++){
-                ViewSpan viewSpan = viewSpans[i];
-                //根据方向重置排版top偏移
-                int viewHeight = viewSpan.getHeight();
-                viewSpan.setLineLayoutTop(newLineTop);
-                if(Gravity.TOP==newLineGravity){
-                    viewSpan.setTopOffset(0);
-                } else if(Gravity.CENTER==newLineGravity){
-                    viewSpan.setTopOffset(((newLineBottom-newLineTop)-viewHeight)/2);
-                } else if(Gravity.BOTTOM==newLineGravity){
-                    viewSpan.setTopOffset(newLineBottom-viewHeight);
-                }
-                viewSpan.attachToView();
-            }
-        }
+        //排版子控件，其他操作也可以在这里进行
+        textLine.layoutViewSpan(source,0,0);
     }
 
     /**
@@ -993,7 +999,7 @@ public class RecyclerStaticLayout extends Layout {
      */
     private void layoutViewSpan(Paragraph paragraph,ReplacementSpan replacementSpan,float left,float top) {
         //排版view
-        if(replacementSpan instanceof ViewSpan){
+        if(null!=replacementSpan&&replacementSpan instanceof ViewSpan){
             float layoutTop=0;
             if(null!=paragraph.textParagraph){
                 layoutTop=top-paragraph.textParagraph.getLineTop();
