@@ -91,6 +91,8 @@ public class TextParagraph extends TextLine{
             canvas.translate(0,lineTop);
             LineDecoration lineDecoration = getLineDecoration();
             int scrollLineTop = getDecoratedScrollLineTop();
+            //绘装饰器
+//            lineDecoration.onLineDraw(canvas,this,outerWidth,outerHeight);
             for(int i=0;i<lineCount;i++){
                 TextLine textLine = textLines[i];
                 int textLineTop = textLine.getLineTop();

@@ -88,6 +88,7 @@ public class RecyclerStaticLayout extends Layout {
         this.height=height;
         this.spacingAdd=spacingAdd;
         this.textAlign = textAlign;
+        this.textRender=textRender;
         this.lineDecoration=lineDecoration;
         this.fontMetricsInt = new Paint.FontMetricsInt();
         this.textLines = new TextLine[3];
@@ -238,8 +239,7 @@ public class RecyclerStaticLayout extends Layout {
                         if(null==paragraph.textParagraph){
                             lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
                             TextParagraph textParagraph=new TextParagraph();
-                            w += decorationTmpRect.left;
-                            v += decorationTmpRect.top;
+                            v+=decorationTmpRect.top;
                             textParagraph.setLineTop(v);
                             float lineHeight= (paragraphFontMetrics.descent - paragraphFontMetrics.ascent);
                             textParagraph.setLineDescent(paragraphFontMetrics.descent);
@@ -260,6 +260,7 @@ public class RecyclerStaticLayout extends Layout {
                             here = i;
                         }
                         //输出行信息
+                        lineDecoration.getParagraphLineOffsets(paragraph.textParagraph,paragraph.lineCount, decorationTmpRect);
                         outTextLine(paragraph,here, next, paragraphFontMetrics.ascent, paragraphFontMetrics.descent, w, v,spacingAdd,align, decorationTmpRect,false);
                         layoutViewSpan(paragraph,replacementSpan, w,v);
                         here = next;
@@ -393,6 +394,7 @@ public class RecyclerStaticLayout extends Layout {
                 paragraphLayoutInfo.paragraphLeftOffset=w;
                 paragraphLayoutInfo.paragraphHeight=v+(paragraphLayoutInfo.paragraphFontMetrics.descent- paragraphLayoutInfo.paragraphFontMetrics.ascent);
                 lineLayoutMode = ReplacementSpan.FLOW;
+                w+=decorationTmpRect.left;
             }
         }
         if (end != here) {
@@ -769,6 +771,7 @@ public class RecyclerStaticLayout extends Layout {
         int lineHeight = lines[off].getLineHeight();
         lines[off].setLineTop(firstLineTop-decoratedRect.bottom-lineHeight);
         lines[off].setLineBottom(firstLineTop-decoratedRect.bottom);
+        lines[off].setLineDecoration(lineDecoration);
         lines[off].setScrollOffset(scrollY);
         //填充指定行信息
         onNewTextLineFilled(lines[off]);
@@ -816,6 +819,7 @@ public class RecyclerStaticLayout extends Layout {
         lines[line].setLineTop(lineTop+decoratedRect.top);
         lines[line].setLineBottom(lineTop+decoratedRect.top+lineHeight);
         lines[line].setScrollOffset(scrollY);
+        lines[line].setLineDecoration(lineDecoration);
         //填充指定行信息
         onNewTextLineFilled(lines[line]);
         int consumed=0;
@@ -910,6 +914,7 @@ public class RecyclerStaticLayout extends Layout {
         removeTextLineAt(index);
         //回收行信息
         TextLine textLine = textLines[index];
+        //todo 回收段落
         TextLine.recycle(textLine);
         textLines[index]=null;
         System.arraycopy(textLines,1, textLines,index, textLines.length-1);
@@ -932,6 +937,12 @@ public class RecyclerStaticLayout extends Layout {
      * @param index
      */
     private void removeTextLineAt(int index) {
+        //渲染通知停止
+        TextLine textLine = textLines[index];
+        int start = textLine.getLineStart();
+        int end = textLine.getLineEnd();
+        textRender.removeTextLine(source,start,end);
+        //移除viewSpan
         if(source instanceof Spanned){
             Spanned spanned = (Spanned) this.source;
             int lineLatterStart = getLineLatterStart(index);

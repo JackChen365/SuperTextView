@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".ui.span.TextSpanActivity">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sample"
+                android:padding="12dp"
+                android:background="@color/lightGray"/>
+
+            <com.cz.widget.supertextview.library.view.RecyclerTextLayout
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:gravity="center"
+                android:background="?colorPrimary"
+                android:text="@string/login"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"/>
+
+            <com.cz.widget.supertextview.library.view.RecyclerTextLayout
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
+                android:background="?colorPrimary"
+                android:text="@string/loading"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"/>
+
+            <com.cz.widget.supertextview.library.view.RecyclerTextLayout
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
+                android:background="?colorPrimary"
+                android:text="@string/loading"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"/>
+
+            <com.cz.widget.supertextview.library.view.RecyclerTextLayout
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:gravity="center"
+                android:layout_marginTop="4dp"
+                android:background="?colorPrimary"
+                android:text="@string/loading"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/startButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:text="Start"/>
+
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:text="Stop"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</FrameLayout>

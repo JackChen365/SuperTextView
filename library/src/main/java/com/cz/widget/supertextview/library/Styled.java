@@ -101,13 +101,13 @@ public class Styled
                 }
                 //这里根据方向动态决定位置
                 if(Gravity.TOP==textGravity){
-                    textRender.drawText(canvas,workPaint,tmp,tmpstart,tmpend,x, top-workPaint.ascent() + workPaint.baselineShift);
+                    textRender.drawText(canvas,tmp,tmpstart,tmpend,x, top-workPaint.ascent() + workPaint.baselineShift,workPaint);
                 } else if(Gravity.CENTER==textGravity){
                     float textY=(bottom-top) / 2 + (workPaint.descent()-workPaint.ascent()) / 2 - workPaint.descent();
-                    textRender.drawText(canvas,workPaint,tmp,tmpstart,tmpend, x, top + textY + workPaint.baselineShift);
+                    textRender.drawText(canvas,tmp,tmpstart,tmpend, x, top + textY + workPaint.baselineShift,workPaint);
                 } else {
                     canvas.drawText(tmp, tmpstart, tmpend, x, y + workPaint.baselineShift, workPaint);
-                    textRender.drawText(canvas,workPaint,tmp,tmpstart,tmpend, x, y + workPaint.baselineShift);
+                    textRender.drawText(canvas,tmp,tmpstart,tmpend, x, y + workPaint.baselineShift,workPaint);
                 }
             } else {
                 if (needWidth) {
@@ -118,7 +118,7 @@ public class Styled
             ret = replacement.getSize(workPaint, text, start, end, fmi);
 
             if (canvas != null) {
-                replacement.draw(canvas, text, start, end,
+                textRender.drawReplacementSpan(canvas, replacement,text, start, end,
                         x, top, y, bottom, workPaint);
             }
         }

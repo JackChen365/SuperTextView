@@ -10,7 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".extension.SelectTextActivity"></activity>
+        <activity android:name=".animation.AnimationText2Activity"></activity>
+        <activity android:name=".animation.AnimationText1Activity" />
+        <activity android:name=".extension.SelectTextActivity" />
         <activity
             android:name=".version1.TextLayoutSample3Activity"
             android:label="@string/title_activity_text_layout_sample3"

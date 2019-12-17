@@ -53,36 +53,36 @@ class TextLayoutSample3Activity : ToolBarActivity() {
 //        val spanCount=10+Random.nextInt(10)
 //        val text=(0 until spanCount*2).
 //            map { DataProvider.ITEMS[DataProvider.RANDOM.nextInt(DataProvider.ITEMS.size)] }.joinToString(" ")
-        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
-        val spannableString=SpannableString(text)
-//        初始化span
-        var start=0
-        val positionList= mutableListOf<Int>()
-        val spanPositionList= mutableListOf<Int>()
-        while(-1!=start){
-            val i=Random.nextInt(SPAN_COUNT)
-            var index=text.indexOf(" ",start+1)
-            if(-1!=index){
-                spanPositionList.add(i)
-                val textSpan = getTextSpan(i)
-                if(null!=textSpan){
-                    positionList.add(index)
-                    if(textSpan is ReplacementSpan){
-                        spannableString.setSpan(textSpan,index, Math.min(text.length,index+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    } else {
-                        spannableString.setSpan(textSpan, index, Math.min(text.length,index+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                }
-            }
-            start=index
-        }
-        output.clear()
-        output.append("$text\n")
-        output.append("$positionList\n")
-        output.append("$spanPositionList\n")
-        textLayout.clear()
-        textLayout.setLineDecoration(lineDecoration)
-        textLayout.setText(spannableString)
+////        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
+//        val spannableString=SpannableString(text)
+////        初始化span
+//        var start=0
+//        val positionList= mutableListOf<Int>()
+//        val spanPositionList= mutableListOf<Int>()
+//        while(-1!=start){
+//            val i=Random.nextInt(SPAN_COUNT)
+//            var index=text.indexOf(" ",start+1)
+//            if(-1!=index){
+//                spanPositionList.add(i)
+//                val textSpan = getTextSpan(i)
+//                if(null!=textSpan){
+//                    positionList.add(index)
+//                    if(textSpan is ReplacementSpan){
+//                        spannableString.setSpan(textSpan,index, Math.min(text.length,index+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//                    } else {
+//                        spannableString.setSpan(textSpan, index, Math.min(text.length,index+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//                    }
+//                }
+//            }
+//            start=index
+//        }
+//        output.clear()
+//        output.append("$text\n")
+//        output.append("$positionList\n")
+//        output.append("$spanPositionList\n")
+//        textLayout.clear()
+//        textLayout.setLineDecoration(lineDecoration)
+//        textLayout.setText(spannableString)
 
 //        val spanCount=8
 //        val text=(0 until spanCount).
@@ -100,31 +100,31 @@ class TextLayoutSample3Activity : ToolBarActivity() {
 //        }
 //        val length = text.length
 
-//        Hereford Hop Siraz Nantais Manouri Schloss Mozzarella di Bufala Greuilh Grana Padano Northumberland Queso del Montsec Lajta Abertam Tourmalet Button (Innes) Tete de Moine Cabrales Queso Iberico Baylough Shropshire Blue Trappe (Veritable) Casciotta di Urbino Valencay Ossau Fermier Sourire Lozerien Loch Arthur Farmhouse Shelburne Cheddar Leafield Cheddar Clothbound Queso Fresco (Adobera) Brin d'Amour Harbourne Blue Pate de Fromage
-//        [8, 12, 18, 26, 34, 42, 53, 56, 63, 71, 77, 84, 99, 105, 109, 117, 123, 131, 141, 148, 156, 161, 164, 170, 179, 185, 193, 202, 213, 218, 225, 237, 247, 250, 257, 266, 272, 280, 288, 297, 302, 309, 319, 329, 337, 346, 354, 365, 371, 378, 388, 393, 401, 411, 416, 421, 424]
-//        [4, 6, 11, 8, 4, 3, 5, 0, 12, 10, 3, 3, 9, 12, 8, 11, 11, 2, 6, 0, 7, 8, 1, 2, 1, 11, 8, 0, 2, 12, 2, 9, 8, 11, 1, 11, 2, 2, 3, 12, 1, 1, 1, 5, 7, 7, 2, 6, 11, 3, 2, 7, 6, 2, 7, 11, 4]
+//        Chevres Whitestone Farmhouse Aubisque Pyrenees Ulloa Le Brin Tomme de Savoie Croghan Ardi Gasna Herriot Farmhouse Molbo Croghan Bougon Petit Pardou Cheddar Clothbound Quark (Australian) Vasterbottenost Kadchgall Patefine Fort Selva Queso Para Frier Castellano Ridder Cheddar Haloumi-Style Cheese Cottage Cheese Brie Castelmagno Crema Agria Queso de Murcia Sonoma Jack Mahon Serat Swaledale Gabriel
+//        [7, 18, 28, 37, 46, 52, 55, 60, 66, 69, 76, 84, 89, 95, 103, 113, 119, 127, 134, 140, 147, 155, 166, 172, 185, 201, 211, 220, 225, 231, 237, 242, 248, 259, 266, 274, 288, 295, 303, 310, 315, 327, 333, 339, 345, 348, 355, 362, 367, 373, 379, 389]
+//        [9, 1, 9, 2, 10, 0, 1, 1, 6, 6, 1, 6, 1, 6, 5, 2, 1, 4, 8, 9, 3, 7, 6, 8, 9, 3, 0, 7, 0, 4, 2, 2, 3, 12, 12, 2, 5, 8, 12, 8, 6, 5, 11, 8, 10, 5, 1, 8, 3, 8, 8, 4]
 
 
 //        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
-//
-////        val text="Button (Innes) Tete de Moine Cabrales Queso Iberico Baylough Shropshire Blue "
-//        val spannableString=SpannableString(text)
-////        //初始化span
-//        val index=text.indexOf("\n")
-//        val positionList= mutableListOf(8, 22)
-//        val spanPositionList= mutableListOf(0, 1)
-//        positionList.forEachIndexed { index, position->
-//            var textSpan = getTextSpan(spanPositionList[index])
-//            if(textSpan is ReplacementSpan){
-//                spannableString.setSpan(textSpan, position, position+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-//            } else {
-//                spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-//            }
-//        }
-//        //更新布局
-//        textLayout.clear()
-//        textLayout.setLineDecoration(lineDecoration)
-//        textLayout.setText(spannableString)
+
+        val text="Chevres Whitestone Farmhouse Aubisque Pyrenees Ulloa Le Brin Tomme de Savoie Croghan Ardi Gasna Herriot Farmhouse Molbo Croghan Bougon Petit Pardou Cheddar Clothbound Quark (Australian) Vasterbottenost Kadchgall Patefine Fort Selva Queso Para Frier Castellano Ridder Cheddar Haloumi-Style Cheese Cottage Cheese Brie Castelmagno Crema Agria Queso de Murcia Sonoma Jack Mahon Serat Swaledale Gabriel"
+        val spannableString=SpannableString(text)
+//        //初始化span
+        val index=text.indexOf("\n")
+        val positionList= mutableListOf(52, 55, 60, 66, 69, 76, 84, 89, 95, 103, 113, 119, 127, 134, 140, 147, 155, 166, 172, 185, 201, 211, 220, 225, 231, 237, 242, 248, 259, 266, 274, 288, 295, 303, 310, 315, 327, 333, 339, 345, 348, 355, 362, 367, 373, 379, 389)
+        val spanPositionList= mutableListOf(0, 1, 1, 6, 6, 1, 6, 1, 6, 5, 2, 1, 4, 8, 9, 3, 7, 6, 8, 9, 3, 0, 7, 0, 4, 2, 2, 3, 12, 12, 2, 5, 8, 12, 8, 6, 5, 11, 8, 10, 5, 1, 8, 3, 8, 8, 4)
+        positionList.forEachIndexed { index, position->
+            var textSpan = getTextSpan(spanPositionList[index])
+            if(textSpan is ReplacementSpan){
+                spannableString.setSpan(textSpan, position, position+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            } else {
+                spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        //更新布局
+        textLayout.clear()
+        textLayout.setLineDecoration(lineDecoration)
+        textLayout.setText(spannableString)
 
 
 

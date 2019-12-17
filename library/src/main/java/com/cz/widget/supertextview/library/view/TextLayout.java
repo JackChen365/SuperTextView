@@ -111,7 +111,7 @@ public class TextLayout extends ViewGroup implements Callback {
     }
 
     public void setTextRender(TextRender textRender){
-        textRender.setCallback(this);
+        textRender.setTarget(this);
         this.textRender=textRender;
     }
 
@@ -197,45 +197,13 @@ public class TextLayout extends ViewGroup implements Callback {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //调试绘制信息
-        debugDraw(canvas);
         //绘制选中
         if(null!=layout){
             canvas.save();
             canvas.translate(getPaddingLeft()*1f,getPaddingTop()*1f);
+            //绘制行装饰器
+//            lineDecoration.onLineDraw(canvas,this, width, height);
             layout.draw(canvas);
-            canvas.restore();
-        }
-    }
-
-
-    /**
-     * 调试绘制信息
-     */
-    private void debugDraw(Canvas canvas) {
-        final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStrokeWidth(1f);
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.STROKE);
-
-        int width = getWidth();
-        int height = getHeight();
-        int paddingLeft = getPaddingLeft();
-        int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingRight();
-        int paddingBottom = getPaddingBottom();
-        //绘制内边距
-        canvas.drawRect(new Rect(paddingLeft,paddingTop,width-paddingRight,height-paddingBottom),paint);
-        //绘制每一行间隔
-        if(null!=layout){
-            final int lineCount = layout.getLineCount();
-            canvas.save();
-            canvas.translate(paddingLeft*1f,paddingTop*1f);
-            for(int i=0; i < lineCount;i++){
-                int lineBottom = layout.getDecoratedScrollLineBottom(i);
-                canvas.drawLine(0f,lineBottom*1f,
-                        width-paddingLeft-paddingRight,lineBottom*1f,paint);
-            }
             canvas.restore();
         }
     }

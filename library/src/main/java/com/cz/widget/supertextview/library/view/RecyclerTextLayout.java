@@ -1,10 +1,10 @@
 package com.cz.widget.supertextview.library.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Build;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -16,12 +16,10 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.EdgeEffect;
 import android.widget.OverScroller;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.view.ViewCompat;
-import androidx.core.widget.EdgeEffectCompat;
-
 import com.cz.widget.supertextview.library.R;
 import com.cz.widget.supertextview.library.decoration.DefaultLineDecoration;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
@@ -67,8 +65,8 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
     //行装饰器
     private LineDecoration lineDecoration=new DefaultLineDecoration();
     //边缘阴影
-    private EdgeEffectCompat startEdge;
-    private EdgeEffectCompat endEdge;
+    private EdgeEffect startEdge;
+    private EdgeEffect endEdge;
     //手势拖动--------
     private boolean isBeingDragged=false;
     private int touchSlop = 0;
@@ -90,8 +88,8 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
     public RecyclerTextLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
-        startEdge = new EdgeEffectCompat(context);
-        endEdge = new EdgeEffectCompat(context);
+        startEdge = new EdgeEffect(context);
+        endEdge = new EdgeEffect(context);
 
         final ViewConfiguration configuration = ViewConfiguration.get(context);
         touchSlop = configuration.getScaledTouchSlop();
@@ -124,8 +122,12 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
     }
 
     public void setTextRender(TextRender textRender){
-        textRender.setCallback(this);
+        textRender.setTarget(this);
         this.textRender=textRender;
+    }
+
+    public TextRender getTextRender() {
+        return textRender;
     }
 
     /**
@@ -159,7 +161,10 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
         int measuredWidth = getMeasuredWidth();
         int measuredHeight = getMeasuredHeight();
         final int outerWidth=measuredWidth - getPaddingLeft() - getPaddingRight();
-        final int outerHeight=measuredHeight-getPaddingTop()-getPaddingBottom();
+        int outerHeight=measuredHeight-getPaddingTop()-getPaddingBottom();
+        if(outerHeight<0){
+            outerHeight=1;
+        }
         if(null!=text){
             //文本不同重新初始化
             if(null==layout||text!=layout.getText()){
@@ -170,8 +175,8 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
             }
         }
 //        //重新设置尺寸
-        if(null!=layout&&measuredHeight!=(layout.getLayoutHeight()+getPaddingTop()+getPaddingBottom())){
-            final int layoutHeight=layout.getLayoutHeight();
+        if(null!=layout&&measuredHeight!=(layout.getHeight()+getPaddingTop()+getPaddingBottom())){
+            final int layoutHeight=layout.getHeight();
             setMeasuredDimension(measuredWidth,getPaddingTop()+layoutHeight+getPaddingBottom());
         }
     }
@@ -265,7 +270,7 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
             startEdge.setSize(width, height);
             //绘制边缘效果图，如果绘制需要进行动画效果返回true
             if (startEdge.draw(canvas)) {
-                ViewCompat.postInvalidateOnAnimation(this);//进行动画
+                postInvalidateOnAnimation(this);//进行动画
             }
             canvas.restoreToCount(restoreCount);
         }
@@ -276,9 +281,17 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
             canvas.rotate(180f, width * 1f, 0f);
             endEdge.setSize(width, height);
             if (endEdge.draw(canvas)) {
-                ViewCompat.postInvalidateOnAnimation(this);
+                postInvalidateOnAnimation(this);
             }
             canvas.restoreToCount(restoreCount);
+        }
+    }
+
+    void postInvalidateOnAnimation(View view) {
+        if (Build.VERSION.SDK_INT >= 16) {
+            view.postInvalidateOnAnimation();
+        } else {
+            view.postInvalidate();
         }
     }
 
@@ -301,6 +314,9 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if(null==layout){
+            return false;
+        }
         int action = ev.getActionMasked();
         if (super.onInterceptTouchEvent(ev)) {
             return true;
@@ -345,6 +361,9 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(null==layout){
+            return false;
+        }
         if (velocityTracker == null) {
             velocityTracker = VelocityTracker.obtain();
         }
@@ -352,10 +371,10 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
         int action = event.getActionMasked();
         if(MotionEvent.ACTION_DOWN==action) {
             lastMotionY = event.getY();
-            ViewParent parent = getParent();
-            if(null!=parent) {
-                parent.requestDisallowInterceptTouchEvent(true);
-            }
+//            ViewParent parent = getParent();
+//            if(null!=parent) {
+//                parent.requestDisallowInterceptTouchEvent(true);
+//            }
         } else if(MotionEvent.ACTION_MOVE==action) {
             float x = event.getX();
             float y = event.getY();
@@ -377,18 +396,18 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
                 int scrollY = layout.getScrollY();
                 if (-scrollY <= 0) {
                     //在顶部
-                    startEdge.onPull((int)(-yDiff / height), 1f-(int)(x / getWidth()));
-                    if (!endEdge.isFinished()) {
-                        endEdge.onRelease();
-                    }
-                    invalidate();
+//                    startEdge.onPull((int)(-yDiff / height), 1f-(int)(x / getWidth()));
+//                    if (!endEdge.isFinished()) {
+//                        endEdge.onRelease();
+//                    }
+//                    invalidate();
                 } else if (!layout.canVerticalScroll()) {
-                    //在底部
-                    endEdge.onPull((int)(-yDiff / height), 1f-(int)(x / getWidth()));
-                    if (!startEdge.isFinished()) {
-                        startEdge.onRelease();
-                    }
-                    invalidate();
+//                    //在底部
+//                    endEdge.onPull((int)(-yDiff / height), 1f-(int)(x / getWidth()));
+//                    if (!startEdge.isFinished()) {
+//                        startEdge.onRelease();
+//                    }
+//                    invalidate();
                 }
             }
         } else if(MotionEvent.ACTION_UP==action){
@@ -401,7 +420,7 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
         } else if(MotionEvent.ACTION_CANCEL==action){
             releaseDrag();
         }
-        return true;
+        return isBeingDragged;
     }
 
     /**
@@ -465,7 +484,7 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
                 } else {
                     invalidate();
                     //持续发送事件
-                    ViewCompat.postOnAnimation(RecyclerTextLayout.this, this);
+                    postOnAnimation(RecyclerTextLayout.this, this);
                 }
             }
         }
@@ -515,7 +534,15 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
 
         void postOnAnimation() {
             removeCallbacks(this);
-            ViewCompat.postOnAnimation(RecyclerTextLayout.this, this);
+            postOnAnimation(RecyclerTextLayout.this, this);
+        }
+
+        void postOnAnimation(View view, Runnable action) {
+            if (Build.VERSION.SDK_INT >= 16) {
+                view.postOnAnimation(action);
+            } else {
+                view.postDelayed(action, ValueAnimator.getFrameDelay());
+            }
         }
     }
 

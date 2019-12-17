@@ -107,7 +107,12 @@ public abstract class Layout {
      * @return
      */
     public int getHeight() {
-        return getDecoratedScrollLineTop(getLineCount());
+        int height=0;
+        int lineCount = getLineCount();
+        if(0<lineCount){
+            height=getDecoratedScrollLineBottom(lineCount-1);
+        }
+        return height;
     }
 
     public int getLayoutWidth(){
