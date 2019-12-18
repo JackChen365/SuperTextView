@@ -10,16 +10,17 @@ import android.text.Spannable
 import android.view.LayoutInflater
 import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
+
 import com.cz.widget.supertextview.sample.R
 import com.okay.sampletamplate.ToolBarActivity
-import kotlinx.android.synthetic.main.activity_select_text2.*
+import kotlinx.android.synthetic.main.activity_select_text.*
 
-class SelectTextActivity : ToolBarActivity() {
+class SelectTextWordActivity : ToolBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_select_text2)
-        //初始化span列表
+        setContentView(R.layout.activity_select_text)
+//初始化span列表
         val spanList= mutableMapOf<String,Any>()
         //        //添加View
         val layoutInflater = LayoutInflater.from(this)
@@ -68,4 +69,3 @@ class SelectTextActivity : ToolBarActivity() {
         textLayout.setText(spannableString)
     }
 }
-

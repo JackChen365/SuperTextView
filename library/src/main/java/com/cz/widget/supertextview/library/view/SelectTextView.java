@@ -7,10 +7,12 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.text.Spannable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.cz.widget.supertextview.library.layout.Layout;
 import com.cz.widget.supertextview.library.span.ForegroundColorSpan;
+import com.cz.widget.supertextview.library.spannable.SpannableString;
 
 public class SelectTextView  extends RecyclerTextLayout {
     /**
@@ -49,23 +51,24 @@ public class SelectTextView  extends RecyclerTextLayout {
         Layout layout = getLayout();
         if (null != layout) {
             CharSequence text = layout.getText();
-            if(text instanceof Spannable&&null!=selectForegroundColorSpan){
-                Spannable spannable = (Spannable) text;
+            if(text instanceof SpannableString&&null!=selectForegroundColorSpan){
+                SpannableString spannable = (SpannableString) text;
                 spannable.removeSpan(selectForegroundColorSpan);
             }
-            int line = layout.getLineForVertical((int)y);
             //记录选中起始位置
-            selectStart = layout.getOffsetForHorizontal(line, x);
-            //单字
-//            layout.getSelectionPath(selectStart, selectStart + 1, selectPath)
-            //重新设置选中span
-            if(text instanceof Spannable){
-                //设置背景
-                Spannable spannable = (Spannable) text;
-                selectForegroundColorSpan=new ForegroundColorSpan(Color.WHITE);
-                spannable.setSpan(selectForegroundColorSpan, selectStart, selectStart+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            selectStart = layout.getOffsetForHorizontal(x,y);
+            if(-1!=selectStart){
+                //单字
+                layout.getSelectionPath(selectStart, selectStart + 1, selectPath);
+                //重新设置选中span
+                if(text instanceof SpannableString){
+                    //设置背景
+                    SpannableString spannable = (SpannableString) text;
+                    selectForegroundColorSpan=new ForegroundColorSpan(Color.WHITE);
+                    spannable.setSpan(selectForegroundColorSpan, selectStart, selectStart+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                invalidate();
             }
-            invalidate();
         }
     }
 
@@ -76,22 +79,25 @@ public class SelectTextView  extends RecyclerTextLayout {
         Layout layout = getLayout();
         if (null != layout) {
             CharSequence text=layout.getText();
-            if(text instanceof Spannable&&null!=selectForegroundColorSpan){
-                Spannable spannable = (Spannable) text;
-                spannable.removeSpan(selectForegroundColorSpan);
-            }
-            int line = layout.getLineForVertical((int)y);
             //记录选中起始位置
-            int off = layout.getOffsetForHorizontal(line, x);
-//            layout.getSelectionPath(selectStart, off + 1, selectPath);
-            //重新设置选中span
-            if(text instanceof Spannable){
-                //设置背景
-                selectForegroundColorSpan=new ForegroundColorSpan(Color.WHITE);
-                Spannable spannable = (Spannable) text;
-                spannable.setSpan(selectForegroundColorSpan, selectStart, off+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            int off = layout.getOffsetForHorizontal(x,y);
+            if(-1!=selectStart&&-1!=off){
+                int start=Math.min(selectStart,off);
+                int end=Math.max(selectStart,off);
+                layout.getSelectionPath(start, end, selectPath);
+                //重新设置选中span
+                if(text instanceof SpannableString){
+                    //设置背景
+                    SpannableString spannable = (SpannableString) text;
+                    spannable.removeSpan(selectForegroundColorSpan);
+                    //如果start与end相同,会导致span选中整行???
+                    if(start != end){
+                        selectForegroundColorSpan=new ForegroundColorSpan(Color.WHITE);
+                        spannable.setSpan(selectForegroundColorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    }
+                }
+                invalidate();
             }
-            invalidate();
         }
     }
 
@@ -105,7 +111,7 @@ public class SelectTextView  extends RecyclerTextLayout {
         } else if(MotionEvent.ACTION_MOVE==action){
             updateSelection(x-getPaddingLeft(), y-getPaddingTop());
         }
-        return super.onTouchEvent(event);
+        return true;
     }
 
     @Override

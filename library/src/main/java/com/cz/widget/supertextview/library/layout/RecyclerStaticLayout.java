@@ -2,6 +2,7 @@ package com.cz.widget.supertextview.library.layout;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -1080,6 +1081,168 @@ public class RecyclerStaticLayout extends Layout {
      */
     private int getParagraphLine(int line) {
         return textLines[line].getParagraphLine();
+    }
+
+    /**
+     * 复写此方法,获取横向文本位置
+     * 如果选中控件,或者其他空余内容,返回-1
+     * @param x
+     * @param y
+     * @return
+     */
+    @Override
+    public int getOffsetForHorizontal(float x, float y) {
+        int index;
+        int line = getLineForVertical((int) y);
+        TextLine textLine = textLines[line];
+        if(!(textLine instanceof TextParagraph)){
+            index = super.getOffsetForHorizontal(x,y);
+        } else {
+            TextParagraph textParagraph = (TextParagraph) textLine;
+            int textParagraphLine = getTextLineForVertical(textParagraph, (int) y);
+            index = getTextLineOffsetForHorizontal(textParagraph, textParagraphLine, x);
+        }
+        return index;
+    }
+
+    /**
+     * 返回指定y轨位置所在行
+     * @param vertical 纵轨位置
+     * @return
+     */
+    private int getTextLineForVertical(TextParagraph textParagraph,int vertical) {
+        int high = textParagraph.getLineCount(), low = -1, guess;
+        while (high - low > 1) {
+            guess = (high + low) / 2;
+            if (textParagraph.getDecoratedScrollLineTop(guess) > vertical)
+                high = guess;
+            else
+                low = guess;
+        }
+        if (low < 0)
+            return 0;
+        else
+            return low;
+    }
+
+    /**
+     * Get the line number on which the specified text offset appears.
+     * If you ask for a position before 0, you get 0; if you ask for a position
+     * beyond the end of the text, you get the last line.
+     */
+    private int getTextLineForOffset(TextParagraph textParagraph,int offset) {
+        int high = textParagraph.getLineCount(), low = -1, guess;
+
+        while (high - low > 1) {
+            guess = (high + low) / 2;
+
+            if (textParagraph.getLineLatterStart(guess) > offset)
+                high = guess;
+            else
+                low = guess;
+        }
+
+        if (low < 0)
+            return 0;
+        else
+            return low;
+    }
+
+    /**
+     * Get the character offset on the specfied line whose position is
+     * closest to the specified horizontal position.
+     */
+    private int getTextLineOffsetForHorizontal(TextParagraph textParagraph,int line, float offset) {
+        int index=-1;
+        int start = textParagraph.getLineLatterStart(line);
+        int end = textParagraph.getLineLatterEnd(line);
+        float x=textParagraph.getLineLeft(line);
+        //如果初始超出,可能代表左侧有内容,需要往前检测
+        if(offset > x){
+            for (int i = start; i < end; i++) {
+                x = Styled.measureText(paint, workPaint, text, i, i+1,x);
+                if(offset<x){
+                    index=i;
+                    break;
+                }
+            }
+        }
+        return index;
+    }
+
+    /**
+     * 标记选中范围path
+     * @param start
+     * @param end
+     * @param selectPath
+     */
+    public void getSelectionPath(int start, int end, Path selectPath){
+        int lineTop;
+        int lineLeft;
+        int lineBottom;
+        int latterStart;
+        int latterEnd;
+        int paragraphLine=0;
+        int line=getLineForOffset(start);
+        TextLine textLine = textLines[line];
+        if(textLine instanceof TextParagraph){
+            TextParagraph textParagraph = (TextParagraph) textLine;
+            paragraphLine = getTextLineForOffset(textParagraph, start);
+            lineLeft=textParagraph.getLineLeft(paragraphLine);
+            lineTop = textParagraph.getDecoratedScrollLineTop(paragraphLine);
+            lineBottom = textParagraph.getDecoratedScrollLineBottom(paragraphLine);
+            latterStart = textParagraph.getLineLatterStart(paragraphLine);
+            latterEnd = textParagraph.getLineLatterEnd(paragraphLine);
+        } else {
+            lineLeft=0;
+            lineTop = getDecoratedScrollLineTop(line);
+            lineBottom = getDecoratedScrollLineBottom(line);
+            latterStart = getLineLatterStart(line);
+            latterEnd = getLineLatterEnd(line);
+        }
+        //计算起始位置
+        selectPath.reset();
+        float x = Styled.measureText(paint, workPaint, text, latterStart, start,0);
+        for (int i = start; i < end; i++) {
+            //跳转到下一行
+            if(latterEnd <= i){
+                x=0;
+                boolean moveToNextTextLine=true;
+                if(textLine instanceof TextParagraph){
+                    paragraphLine++;
+                    TextParagraph textParagraph = (TextParagraph) textLine;
+                    if(paragraphLine<textParagraph.lineCount){
+                        //段落平移
+                        moveToNextTextLine=false;
+                        lineLeft=textParagraph.getLineLeft(paragraphLine);
+                        lineTop = textParagraph.getDecoratedScrollLineTop(paragraphLine);
+                        lineBottom = textParagraph.getDecoratedScrollLineBottom(paragraphLine);
+                        latterEnd = textParagraph.getLineLatterEnd(paragraphLine);
+                    }
+                }
+                //行平移
+                if(moveToNextTextLine){
+                    paragraphLine=0;
+                    textLine = textLines[++line];
+                    if(textLine instanceof TextParagraph){
+                        TextParagraph textParagraph = (TextParagraph) textLine;
+                        paragraphLine = getTextLineForOffset(textParagraph, start);
+                        lineLeft=textParagraph.getLineLeft(paragraphLine);
+                        lineTop = textParagraph.getDecoratedScrollLineTop(paragraphLine);
+                        lineBottom = textParagraph.getDecoratedScrollLineBottom(paragraphLine);
+                        latterEnd = textParagraph.getLineLatterEnd(paragraphLine);
+                    } else {
+                        lineLeft=0;
+                        lineTop = getDecoratedScrollLineTop(line);
+                        lineBottom = getDecoratedScrollLineBottom(line);
+                        latterEnd = getLineLatterEnd(line);
+                    }
+                }
+            }
+            float left=lineLeft+x;
+            x = Styled.measureText(paint, workPaint, text, i, i+1,x);
+            selectPath.addRect(left,lineTop,lineLeft+x,lineBottom, Path.Direction.CW);
+        }
     }
 
     /**

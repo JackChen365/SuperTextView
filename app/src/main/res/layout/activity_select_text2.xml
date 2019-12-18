@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".extension.SelectTextWordActivity">
 
-    <com.cz.widget.supertextview.library.view.SelectWordTextView
+    <com.cz.widget.supertextview.library.view.SelectTextView
         android:id="@+id/textLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

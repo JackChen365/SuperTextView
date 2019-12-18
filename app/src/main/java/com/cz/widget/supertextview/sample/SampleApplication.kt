@@ -4,6 +4,7 @@ import android.app.Application
 import com.cz.widget.supertextview.sample.animation.AnimationText1Activity
 import com.cz.widget.supertextview.sample.animation.AnimationText2Activity
 import com.cz.widget.supertextview.sample.extension.SelectTextActivity
+import com.cz.widget.supertextview.sample.extension.SelectTextWordActivity
 import com.cz.widget.supertextview.sample.version1.TextLayoutSample1Activity
 import com.cz.widget.supertextview.sample.version1.TextLayoutSample2Activity
 import com.cz.widget.supertextview.sample.version1.TextLayoutSample3Activity
@@ -56,6 +57,11 @@ class SampleApplication: Application() {
                 item{
                     title="选中文本"
                     desc = "演示点击选中单词"
+                    clazz=SelectTextWordActivity::class.java
+                }
+                item{
+                    title="选中文本"
+                    desc = "演示选中滑动文本"
                     clazz=SelectTextActivity::class.java
                 }
             }

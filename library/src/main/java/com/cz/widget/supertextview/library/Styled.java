@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.Gravity;
 
 import com.cz.widget.supertextview.library.render.TextRender;
@@ -95,7 +94,6 @@ public class Styled
                     workPaint.setStyle(s);
                     workPaint.setColor(c);
                 }
-
                 if (needWidth) {
                     ret = workPaint.measureText(tmp, tmpstart, tmpend);
                 }
@@ -109,14 +107,9 @@ public class Styled
                     canvas.drawText(tmp, tmpstart, tmpend, x, y + workPaint.baselineShift, workPaint);
                     textRender.drawText(canvas,tmp,tmpstart,tmpend, x, y + workPaint.baselineShift,workPaint);
                 }
-            } else {
-                if (needWidth) {
-                    ret = workPaint.measureText(tmp, tmpstart, tmpend);
-                }
             }
         } else {
             ret = replacement.getSize(workPaint, text, start, end, fmi);
-
             if (canvas != null) {
                 textRender.drawReplacementSpan(canvas, replacement,text, start, end,
                         x, top, y, bottom, workPaint);
@@ -296,14 +289,45 @@ public class Styled
      * @param text the text to measure
      * @param start the index of the first character to start measuring
      * @param end 1 beyond the index of the last character to measure
-     * @param fmi FontMetrics information; can be null
      * @return The width of the text
      */
     public static float measureText(TextPaint paint,
                                     TextPaint workPaint,
-                                    CharSequence text, int start, int end,
-                                    Paint.FontMetricsInt fmi) {
-        return drawDirectionalRun(null,null, text, start, end,
-                0, 0, 0, 0, fmi, paint, workPaint, Gravity.TOP,true);
+                                    CharSequence text, int start, int end,float x) {
+        Spanned spanned=(Spanned)text;
+        int next;
+        for (int i = start; i < end; i = next) {
+            next = spanned.nextSpanTransition(i, end, MetricAffectingSpan.class);
+            x += measureStyle(spanned, i, next, paint, workPaint);
+        }
+        return x;
+    }
+
+    private static float measureStyle(Spanned text, int start, int end,
+                               TextPaint paint,
+                               TextPaint workPaint){
+        CharacterStyle[] spans = text.getSpans(start, end, CharacterStyle.class);
+        ReplacementSpan replacement = null;
+        paint.bgColor = 0;
+        paint.baselineShift = 0;
+        workPaint.set(paint);
+        if (spans.length > 0) {
+            for (int i = 0; i < spans.length; i++) {
+                CharacterStyle span = spans[i];
+                if (span instanceof ReplacementSpan) {
+                    replacement = (ReplacementSpan)span;
+                }
+                else {
+                    span.updateDrawState(workPaint);
+                }
+            }
+        }
+        float ret;
+        if (replacement == null) {
+            ret = workPaint.measureText(text, start, end);
+        } else {
+            ret = replacement.getSize(workPaint, text, start, end, null);
+        }
+        return ret;
     }
 }
