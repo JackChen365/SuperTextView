@@ -36,10 +36,10 @@ class TextLayoutSample1Activity : ToolBarActivity() {
         spanList.put("ForegroundColorSpan", ForegroundColorSpan(Color.YELLOW))
         spanList.put("RelativeSizeSpan 相对大小（文本字体）", RelativeSizeSpan(2.5f))
         spanList.put("MaskFilterSpan 修饰效果",
-            MaskFilterSpan(BlurMaskFilter(3f, BlurMaskFilter.Blur.OUTER))
+            MaskFilterSpan(BlurMaskFilter(2f, BlurMaskFilter.Blur.OUTER))
         )
         spanList.put("浮雕(EmbossMaskFilter)",
-            MaskFilterSpan(EmbossMaskFilter(floatArrayOf(1f, 1f, 3f), 1.5f, 8f, 3f))
+            MaskFilterSpan(EmbossMaskFilter(floatArrayOf(1f, 1f, 2f), 1.5f, 8f, 3f))
         )
         spanList.put("StrikethroughSpan 删除线（中划线）", StrikethroughSpan())
         spanList.put("UnderlineSpan 下划线", UnderlineSpan())
@@ -52,8 +52,8 @@ class TextLayoutSample1Activity : ToolBarActivity() {
             }
         }
         spanList.put("DynamicDrawableSpan",drawableSpan)
-        spanList.put("RelativeSizeSpan 相对大小（文本字体）", RelativeSizeSpan(2.5f))
-        spanList.put("ScaleXSpan 基于x轴缩放", ScaleXSpan(3.8f))
+        spanList.put("RelativeSizeSpan 相对大小（文本字体）", RelativeSizeSpan(2f))
+        spanList.put("ScaleXSpan 基于x轴缩放", ScaleXSpan(2f))
         spanList.put("StyleSpan 字体样式：粗体、斜体等", StyleSpan(Typeface.BOLD_ITALIC))
         spanList.put("SuperscriptSpan", SuperscriptSpan())
 //

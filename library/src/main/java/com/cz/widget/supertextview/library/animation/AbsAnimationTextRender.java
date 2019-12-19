@@ -2,6 +2,7 @@ package com.cz.widget.supertextview.library.animation;
 
 import android.animation.Animator;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
 import android.util.Log;
@@ -11,6 +12,7 @@ import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -23,17 +25,9 @@ public abstract class AbsAnimationTextRender extends TextRender {
      */
     private final Rect bounds=new Rect();
     /**
-     * 文本渲染起始位置
-     */
-    private int animationTextStart =0;
-    /**
-     * 文本渲染结束位置
-     */
-    private int animationTextEnd=0;
-    /**
      * 动画字符集
      */
-    private final ArrayList<AnimationLetter> animationLetterList=new ArrayList<>();
+    private final ArrayList<AnimationLetter> animationLetterList =new ArrayList<>();
     /**
      * 当前执行动画对象
      */
@@ -43,28 +37,39 @@ public abstract class AbsAnimationTextRender extends TextRender {
      */
     private ITextAnimator textAnimator;
     /**
-     * 动画状态
+     * 动画执行状态
      */
-    private int animationState;
+    private AnimationTextState animationTextState=AnimationTextState.PRE_ANIMATION;
+
     @Override
-    public void removeTextLine(CharSequence source, int start, int end) {
-        //缩小范围元素
-        int letterCount=end-start;
-        if(animationTextStart<=start){
-            animationTextStart+=letterCount;
-        } else if(animationTextEnd>=end){
-            animationTextEnd-=letterCount;
+    public void addText(CharSequence text, int start, int end, float x, float y, TextPaint textPaint) {
+        //添加新的字符元素
+        Paint.FontMetricsInt fontMetricsInt = textPaint.getFontMetricsInt();
+        int textHeight= fontMetricsInt.descent-fontMetricsInt.ascent;
+        for(int i=start;i<end;i++){
+            AnimationLetter animationLetter = AnimationLetter.obtain();
+            animationLetter.setText(text,i,i+1);
+            float textWidth = textPaint.measureText(text, i, i + 1);
+            animationLetter.setBounds(Math.round(x),Math.round(y), Math.round(x+textWidth),Math.round(y+textHeight));
+            animationLetterList.add(animationLetter);
+            x+=textWidth;
         }
+    }
+
+    @Override
+    public void removeText(CharSequence source, int start, int end) {
+        //缩小范围元素
+        List<AnimationLetter> animationLetterList = this.animationLetterList;
         //移除范围内字符
-//        for(Iterator<AnimationLetter> iterator = animationLetterList.iterator();iterator.hasNext();){
-//            AnimationLetter animationLetter = iterator.next();
-//            int latterStart = animationLetter.getStart();
-//            int latterEnd = animationLetter.getEnd();
-//            if(latterStart>=start&&latterEnd<=end){
-//                animationLetter.recycler();
-//                iterator.remove();
-//            }
-//        }
+        for(Iterator<AnimationLetter> iterator = animationLetterList.iterator(); iterator.hasNext();){
+            AnimationLetter animationLetter = iterator.next();
+            int latterStart = animationLetter.getStart();
+            int latterEnd = animationLetter.getEnd();
+            if(latterStart>=start&&latterEnd<=end){
+                animationLetter.recycler();
+                iterator.remove();
+            }
+        }
     }
 
     @Override
@@ -73,31 +78,12 @@ public abstract class AbsAnimationTextRender extends TextRender {
 
     @Override
     public void drawText(Canvas canvas, CharSequence text, int start, int end, float x, float y, TextPaint textPaint) {
-        //超出范围后,添加操作字符位置
-        if(0==animationTextEnd||animationTextStart>start||animationTextEnd<end){
-            //扩大范围
-            if(animationTextStart>start){
-                animationTextStart=start;
-            } else if(animationTextEnd<=end){
-                animationTextEnd=end;
-            }
-            Log.e(TAG,"drawText:"+start+" end:"+end+" animationTextStart:"+animationTextStart+" animationTextEnd:"+animationTextEnd);
-            //添加新的字符元素
-            for(int i=start;i<end;i++){
-                AnimationLetter animationLetter = AnimationLetter.obtain();
-                animationLetter.setText(text,i,i+1);
-                float textWidth = textPaint.measureText(text, i, i + 1);
-                animationLetter.setX(Math.round(x));
-                animationLetterList.add(animationLetter);
-                x+=textWidth;
-            }
-        }
         //更新字符动画
-        for(AnimationLetter animationLetter:animationLetterList){
-            animationLetter.setY(Math.round(y));
+        for(AnimationLetter animationLetter: animationLetterList){
             int latterStart = animationLetter.getStart();
             int latterEnd = animationLetter.getEnd();
             if(latterStart>=start&&latterEnd<=end){
+                animationLetter.setY(y);
                 animationLetter.draw(canvas,textPaint);
             }
         }
@@ -111,6 +97,16 @@ public abstract class AbsAnimationTextRender extends TextRender {
         this.textAnimator=textAnimator;
     }
 
+    public int getLeftPadding(){
+        View target = getTarget();
+        return target.getPaddingLeft();
+    }
+
+    public int getTopPadding(){
+        View target = getTarget();
+        return target.getPaddingTop();
+    }
+
     /**
      * 获得文本动画对象
      * @return
@@ -119,7 +115,7 @@ public abstract class AbsAnimationTextRender extends TextRender {
         return textAnimator;
     }
 
-    public ArrayList<AnimationLetter> getAnimationLetterList() {
+    public ArrayList<AnimationLetter> getAnimationLetterArray() {
         return animationLetterList;
     }
 
@@ -142,6 +138,7 @@ public abstract class AbsAnimationTextRender extends TextRender {
             if(null!=enterAnimator){
                 //记录此动画
                 currentAnimator=enterAnimator;
+                animationTextState=AnimationTextState.RUNNING;
                 //启动动画
                 enterAnimator.start();
             }
@@ -165,6 +162,7 @@ public abstract class AbsAnimationTextRender extends TextRender {
             if(null!=exitAnimator){
                 //记录此动画
                 currentAnimator=exitAnimator;
+                animationTextState=AnimationTextState.RUNNING;
                 //启动动画
                 exitAnimator.start();
             }
@@ -188,6 +186,8 @@ public abstract class AbsAnimationTextRender extends TextRender {
             currentAnimator.cancel();
             currentAnimator=null;
         }
+        //状态停止
+        animationTextState=AnimationTextState.STOP;
         //重绘
         invalidate();
     }

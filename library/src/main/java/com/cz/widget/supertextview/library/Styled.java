@@ -316,8 +316,7 @@ public class Styled
                 CharacterStyle span = spans[i];
                 if (span instanceof ReplacementSpan) {
                     replacement = (ReplacementSpan)span;
-                }
-                else {
+                } else {
                     span.updateDrawState(workPaint);
                 }
             }
@@ -329,5 +328,47 @@ public class Styled
             ret = replacement.getSize(workPaint, text, start, end, null);
         }
         return ret;
+    }
+
+    /**
+     * 排版文本时
+     * @param text
+     * @param start
+     * @param end
+     */
+    public static void preTextRender(TextRender textRender,TextPaint paint,
+                                     TextPaint workPaint, CharSequence text, int start, int end,int x,int y){
+        Spanned spanned=(Spanned)text;
+        int next;
+        int left=x;
+        int from=start;
+        for (int i = start; i < end; i = next) {
+            next = spanned.nextSpanTransition(i, end, MetricAffectingSpan.class);
+            CharacterStyle[] spans = spanned.getSpans(start, end, CharacterStyle.class);
+            ReplacementSpan replacement = null;
+            paint.bgColor = 0;
+            paint.baselineShift = 0;
+            workPaint.set(paint);
+            for (int s = 0; s < spans.length; s++) {
+                CharacterStyle span = spans[s];
+                if (span instanceof ReplacementSpan) {
+                    replacement = (ReplacementSpan)span;
+                } else {
+                    span.updateDrawState(workPaint);
+                }
+            }
+            if (replacement == null) {
+                x += workPaint.measureText(text, start, end);
+            } else {
+                x += replacement.getSize(workPaint, text, start, end, null);
+                textRender.addText(text,from,next,left,y,workPaint);
+                left=x;
+                from=next;
+            }
+        }
+        //回调最后一次
+        if(from!=end){
+            textRender.addText(text,from,end,left,y,workPaint);
+        }
     }
 }

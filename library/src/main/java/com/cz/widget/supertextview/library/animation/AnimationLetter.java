@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.text.TextPaint;
+import android.util.Log;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntRange;
@@ -54,7 +55,7 @@ public class AnimationLetter {
     /**
      * 指定的裁切区域
      */
-    private Rect clipRect;
+    private RectF clipRect;
     /**
      * 裁切模式
      */
@@ -62,7 +63,7 @@ public class AnimationLetter {
     /**
      * 当前文本元素测试矩阵
      */
-    private final Rect bounds=new Rect();
+    private final RectF bounds=new RectF();
     /**
      * 动画状态
      */
@@ -153,7 +154,7 @@ public class AnimationLetter {
 
     public void setX(float x) {
         //x轴位置使用平移计算
-        this.translationX=x-bounds.left;
+        bounds.offsetTo(x,bounds.top);
     }
 
     public float getY() {
@@ -162,7 +163,7 @@ public class AnimationLetter {
 
     public void setY(float y) {
         //y轴位置使用平移计算
-        this.translationY=y-bounds.top;
+        bounds.offsetTo(bounds.left,y);
     }
 
     /**
@@ -172,7 +173,7 @@ public class AnimationLetter {
      * @param right
      * @param bottom
      */
-    public void setBounds(int left,int top,int right,int bottom){
+    public void setBounds(float left,float top,float right,float bottom){
         this.bounds.set(left,top,right,bottom);
     }
 
@@ -190,6 +191,7 @@ public class AnimationLetter {
 
     public void setTranslationY(float translationY) {
         this.translationY = translationY;
+        Log.e("setTranslationY","left:"+hashCode()+" "+(translationX+bounds.left)+" top:"+(this.translationY+bounds.top));
     }
 
     public float getRotate() {
@@ -226,11 +228,11 @@ public class AnimationLetter {
      * @see Region.Op#INTERSECT
      * @see Region.Op#DIFFERENCE
      */
-    public void setClipRect(Rect clipRect,Region.Op op) {
+    public void setClipRect(RectF clipRect,Region.Op op) {
         this.clipRect = clipRect;
         this.op=op;
     }
-    public Rect getBounds() {
+    public RectF getBounds() {
         return bounds;
     }
 

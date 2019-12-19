@@ -49,7 +49,7 @@ class TextLayoutSample2Activity : ToolBarActivity() {
     }
 
     private fun createText(){
-        val spanCount=10+Random.nextInt(10)
+        val spanCount=20+Random.nextInt(10)
         val text=(0 until spanCount).
             map { DataProvider.ITEMS[DataProvider.RANDOM.nextInt(DataProvider.ITEMS.size)] }.joinToString(" ")
         val spannableString=SpannableString(text)
@@ -74,6 +74,9 @@ class TextLayoutSample2Activity : ToolBarActivity() {
         output.append("$text\n")
         output.append("$positionList\n")
         output.append("$spanPositionList\n")
+        textLayout.clear()
+        textLayout.setLineDecoration(lineDecoration)
+        textLayout.setText(spannableString)
 
 //        val spanCount=8
 //        val text=(0 until spanCount).
@@ -90,20 +93,23 @@ class TextLayoutSample2Activity : ToolBarActivity() {
 //            spannableString.setSpan(textSpan, lineStart, lineStart+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 //        }
 
+//        Carre de l'Est Swiss Sap Sago Oschtjepka Capriole Banon Brie de Meaux Sainte Maure Acorn Pelardon des Corbieres Grand Vatel Abbaye de Belloc Frinault Venaco Pave de Chirac Olde York Kashta Petit-Suisse Cornish Pepper Truffe Allgauer Emmentaler Vendomois
+//        [5, 8, 14, 20, 24, 29, 40, 49, 55, 60, 63, 69, 76, 82, 88, 97, 101, 111, 117, 123, 130, 133, 140, 149, 156, 161, 164, 171, 176, 181, 188, 201, 209, 216, 223, 232, 243]
+//        [12, 1, 6, 2, 9, 6, 4, 12, 6, 6, 3, 0, 5, 5, 4, 9, 0, 9, 4, 0, 1, 0, 5, 8, 6, 6, 7, 5, 2, 10, 5, 0, 8, 10, 11, 3, 7]
 
-//        val text="Ardi Gasna Frinault Raschera Baby Swiss Prince-Jean Fougerus St. Agur Blue Cheese Breakfast Cheese Bleu de Gex Briquette de Brebis Aubisque Pyrenees Bruder Basil Cabrales Quark Cheshire Cream Cheese Fromage Corse Cottage Cheese Waimata Farmhouse Blue"
+//        val text="Carre de l'Est Swiss Sap Sago Oschtjepka Capriole Banon Brie de Meaux Sainte Maure Acorn Pelardon des Corbieres Grand Vatel Abbaye de Belloc Frinault Venaco Pave de Chirac Olde York Kashta Petit-Suisse Cornish Pepper Truffe Allgauer Emmentaler Vendomois"
 //        val spannableString=SpannableString(text)
 //        //初始化span
-//        val positionList= mutableListOf(10, 14,10)
-//        val spanPositionList= mutableListOf(10,11,2)
+//        val positionList= mutableListOf(5, 8, 14, 20, 24, 29, 40, 49, 55, 60, 63, 69, 76, 82, 88, 97, 101, 111, 117, 123, 130, 133, 140, 149, 156, 161, 164, 171, 176, 181, 188, 201, 209, 216, 223, 232, 243)
+//        val spanPositionList= mutableListOf(12, 1, 6, 2, 9, 6, 4, 12, 6, 6, 3, 0, 5, 5, 4, 9, 0, 9, 4, 0, 1, 0, 5, 8, 6, 6, 7, 5, 2, 10, 5, 0, 8, 10, 11, 3, 7)
 //        positionList.forEachIndexed { index, position->
 //            var textSpan = getTextSpan(spanPositionList[index])
 //            spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 //        }
-        //更新布局
-        textLayout.clear()
-        textLayout.setLineDecoration(lineDecoration)
-        textLayout.setText(spannableString)
+//        //更新布局
+//        textLayout.clear()
+//        textLayout.setLineDecoration(lineDecoration)
+//        textLayout.setText(spannableString)
     }
 
     /**
@@ -141,9 +147,9 @@ class TextLayoutSample2Activity : ToolBarActivity() {
             6->MaskFilterSpan(EmbossMaskFilter(floatArrayOf(1f, 1f, 3f), 1.5f, 8f, 3f))
             7->StrikethroughSpan()
             8->UnderlineSpan()
-            9->AbsoluteSizeSpan(35, true)
-            10->RelativeSizeSpan(2.5f)
-            11->ScaleXSpan(3.8f)
+            9->AbsoluteSizeSpan(20, true)
+            10->RelativeSizeSpan(2f)
+            11->ScaleXSpan(2f)
             12->StyleSpan(Typeface.BOLD_ITALIC)
             else -> null
         }

@@ -3,7 +3,6 @@ package com.cz.widget.supertextview.library.render;
 import android.graphics.Canvas;
 import android.text.TextPaint;
 import android.view.View;
-import android.widget.TextView;
 
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
 
@@ -36,12 +35,22 @@ public abstract class TextRender {
     }
 
     /**
+     * 添加文本信息
+     * @param text
+     * @param start
+     * @param end
+     * @param x
+     * @param y
+     * @param textPaint
+     */
+    public abstract void addText(CharSequence text, int start, int end, float x, float y, TextPaint textPaint);
+    /**
      * 移除文本信息
      * @param source
      * @param start
      * @param end
      */
-    public abstract void removeTextLine(CharSequence source, int start, int end);
+    public abstract void removeText(CharSequence source, int start, int end);
 
     /**
      * 绘制span元素

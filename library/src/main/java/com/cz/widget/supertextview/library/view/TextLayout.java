@@ -19,6 +19,7 @@ import com.cz.widget.supertextview.library.R;
 import com.cz.widget.supertextview.library.decoration.DefaultLineDecoration;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.layout.Layout;
+import com.cz.widget.supertextview.library.layout.RecyclerStaticLayout;
 import com.cz.widget.supertextview.library.layout.StaticLayout;
 import com.cz.widget.supertextview.library.render.Callback;
 import com.cz.widget.supertextview.library.render.DefaultTextRender;
@@ -120,13 +121,22 @@ public class TextLayout extends ViewGroup implements Callback {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         //测量子孩子尺寸
         measureChildren(widthMeasureSpec,heightMeasureSpec);
-        //初始化Layout
         int measuredWidth = getMeasuredWidth();
-        if(null!=text&&(null==layout||text!=layout.getText())){
-            layout = new StaticLayout(text, textPaint,lineDecoration ,textRender,measuredWidth - getPaddingLeft() - getPaddingRight(), 0f, Gravity.CENTER);
+        int measuredHeight = getMeasuredHeight();
+        final int outerWidth=measuredWidth - getPaddingLeft() - getPaddingRight();
+        int outerHeight=measuredHeight-getPaddingTop()-getPaddingBottom();
+        //初始化Layout
+        if(null!=text){
+            //文本不同重新初始化
+            if(null==layout||text!=layout.getText()){
+                layout = new StaticLayout(text, textPaint, lineDecoration,textRender, outerWidth, 0f, Gravity.CENTER);
+            } else if(outerHeight!=layout.getLayoutHeight()){
+                //外部高度变化,重新加载
+//                layout.setLayoutHeight(outerHeight);
+            }
         }
-        //重新设置尺寸
-        if(null!=layout){
+//        //重新设置尺寸
+        if(null!=layout&&measuredHeight!=(layout.getHeight()+getPaddingTop()+getPaddingBottom())){
             final int layoutHeight=layout.getHeight();
             setMeasuredDimension(measuredWidth,getPaddingTop()+layoutHeight+getPaddingBottom());
         }

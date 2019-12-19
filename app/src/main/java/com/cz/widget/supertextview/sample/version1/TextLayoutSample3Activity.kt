@@ -50,39 +50,40 @@ class TextLayoutSample3Activity : ToolBarActivity() {
     }
 
     private fun createText(){
-//        val spanCount=10+Random.nextInt(10)
+        val spanCount=10+Random.nextInt(10)
 //        val text=(0 until spanCount*2).
 //            map { DataProvider.ITEMS[DataProvider.RANDOM.nextInt(DataProvider.ITEMS.size)] }.joinToString(" ")
-////        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
-//        val spannableString=SpannableString(text)
-////        初始化span
-//        var start=0
-//        val positionList= mutableListOf<Int>()
-//        val spanPositionList= mutableListOf<Int>()
-//        while(-1!=start){
-//            val i=Random.nextInt(SPAN_COUNT)
-//            var index=text.indexOf(" ",start+1)
-//            if(-1!=index){
-//                spanPositionList.add(i)
-//                val textSpan = getTextSpan(i)
-//                if(null!=textSpan){
-//                    positionList.add(index)
-//                    if(textSpan is ReplacementSpan){
-//                        spannableString.setSpan(textSpan,index, Math.min(text.length,index+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-//                    } else {
-//                        spannableString.setSpan(textSpan, index, Math.min(text.length,index+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-//                    }
-//                }
-//            }
-//            start=index
-//        }
-//        output.clear()
-//        output.append("$text\n")
-//        output.append("$positionList\n")
-//        output.append("$spanPositionList\n")
-//        textLayout.clear()
-//        textLayout.setLineDecoration(lineDecoration)
-//        textLayout.setText(spannableString)
+        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
+        val spannableString=SpannableString(text)
+//        初始化span
+        var start=0
+        val positionList= mutableListOf<Int>()
+        val spanPositionList= mutableListOf<Int>()
+        var index=0
+        while(-1!=start){
+            val i=Random.nextInt(SPAN_COUNT)
+            index=text.indexOf(" ",start+1)
+            if(-1!=index){
+                spanPositionList.add(i)
+                val textSpan = getTextSpan(i)
+                if(null!=textSpan){
+                    positionList.add(index)
+                    if(textSpan is ReplacementSpan){
+                        spannableString.setSpan(textSpan,index, Math.min(text.length,index+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    } else {
+                        spannableString.setSpan(textSpan, index, Math.min(text.length,index+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                }
+            }
+            start=index
+        }
+        output.clear()
+        output.append("$text\n")
+        output.append("$positionList\n")
+        output.append("$spanPositionList\n")
+        textLayout.clear()
+        textLayout.setLineDecoration(lineDecoration)
+        textLayout.setText(spannableString)
 
 //        val spanCount=8
 //        val text=(0 until spanCount).
@@ -107,24 +108,27 @@ class TextLayoutSample3Activity : ToolBarActivity() {
 
 //        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
 
-        val text="Chevres Whitestone Farmhouse Aubisque Pyrenees Ulloa Le Brin Tomme de Savoie Croghan Ardi Gasna Herriot Farmhouse Molbo Croghan Bougon Petit Pardou Cheddar Clothbound Quark (Australian) Vasterbottenost Kadchgall Patefine Fort Selva Queso Para Frier Castellano Ridder Cheddar Haloumi-Style Cheese Cottage Cheese Brie Castelmagno Crema Agria Queso de Murcia Sonoma Jack Mahon Serat Swaledale Gabriel"
-        val spannableString=SpannableString(text)
-//        //初始化span
-        val index=text.indexOf("\n")
-        val positionList= mutableListOf(52, 55, 60, 66, 69, 76, 84, 89, 95, 103, 113, 119, 127, 134, 140, 147, 155, 166, 172, 185, 201, 211, 220, 225, 231, 237, 242, 248, 259, 266, 274, 288, 295, 303, 310, 315, 327, 333, 339, 345, 348, 355, 362, 367, 373, 379, 389)
-        val spanPositionList= mutableListOf(0, 1, 1, 6, 6, 1, 6, 1, 6, 5, 2, 1, 4, 8, 9, 3, 7, 6, 8, 9, 3, 0, 7, 0, 4, 2, 2, 3, 12, 12, 2, 5, 8, 12, 8, 6, 5, 11, 8, 10, 5, 1, 8, 3, 8, 8, 4)
-        positionList.forEachIndexed { index, position->
-            var textSpan = getTextSpan(spanPositionList[index])
-            if(textSpan is ReplacementSpan){
-                spannableString.setSpan(textSpan, position, position+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            } else {
-                spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-        }
-        //更新布局
-        textLayout.clear()
-        textLayout.setLineDecoration(lineDecoration)
-        textLayout.setText(spannableString)
+        //        Carre de l'Est Swiss Sap Sago Oschtjepka Capriole Banon Brie de Meaux Sainte Maure Acorn Pelardon des Corbieres Grand Vatel Abbaye de Belloc Frinault Venaco Pave de Chirac Olde York Kashta Petit-Suisse Cornish Pepper Truffe Allgauer Emmentaler Vendomois
+//        [5, 8, 14, 20, 24, 29, 40, 49, 55, 60, 63, 69, 76, 82, 88, 97, 101, 111, 117, 123, 130, 133, 140, 149, 156, 161, 164, 171, 176, 181, 188, 201, 209, 216, 223, 232, 243]
+//        [12, 1, 6, 2, 9, 6, 4, 12, 6, 6, 3, 0, 5, 5, 4, 9, 0, 9, 4, 0, 1, 0, 5, 8, 6, 6, 7, 5, 2, 10, 5, 0, 8, 10, 11, 3, 7]
+//        val text="Carre de l'Est Swiss Sap Sago Oschtjepka Capriole Banon Brie de Meaux Sainte Maure Acorn Pelardon des Corbieres Grand Vatel Abbaye de Belloc Frinault Venaco Pave de Chirac Olde York Kashta Petit-Suisse Cornish Pepper Truffe Allgauer Emmentaler Vendomois"
+//        val spannableString=SpannableString(text)
+////        //初始化span
+//        val index=text.indexOf("\n")
+//        val positionList= mutableListOf(5, 8, 14, 20, 24, 29, 40, 49, 55, 60, 63, 69, 76, 82, 88, 97, 101, 111, 117, 123, 130, 133, 140, 149, 156, 161, 164, 171, 176, 181, 188, 201, 209, 216, 223, 232, 243)
+//        val spanPositionList= mutableListOf(12, 1, 6, 2, 9, 6, 4, 12, 6, 6, 3, 0, 5, 5, 4, 9, 0, 9, 4, 0, 1, 0, 5, 8, 6, 6, 7, 5, 2, 10, 5, 0, 8, 10, 11, 3, 7)
+//        positionList.forEachIndexed { index, position->
+//            var textSpan = getTextSpan(spanPositionList[index])
+//            if(textSpan is ReplacementSpan){
+//                spannableString.setSpan(textSpan, position, position+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            } else {
+//                spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            }
+//        }
+//        //更新布局
+//        textLayout.clear()
+//        textLayout.setLineDecoration(lineDecoration)
+//        textLayout.setText(spannableString)
 
 
 

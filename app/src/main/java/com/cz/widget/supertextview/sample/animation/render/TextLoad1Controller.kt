@@ -16,8 +16,8 @@ import com.cz.widget.supertextview.library.animation.AnimationLetter
 class TextLoad1Controller: AbsAnimationTextRender() {
     override fun getEnterAnimator(animationLetters:List<AnimationLetter>): Animator {
         val animatorSet=AnimatorSet()
-        animationLetters?.filter { it.latter=='.' }?.forEachIndexed { index, element ->
-            val animator = ObjectAnimator.ofFloat(element,"translationY",0f,4f)
+        animationLetters.filter { it.latter=='.' }.forEachIndexed { index, latter ->
+            val animator = ObjectAnimator.ofFloat(latter,"translationY",0f,4f)
             animator.duration=600
             animator.startDelay=index*200L
             animator.repeatCount=-1

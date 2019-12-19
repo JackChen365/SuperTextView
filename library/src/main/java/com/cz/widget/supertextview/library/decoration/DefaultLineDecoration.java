@@ -20,11 +20,11 @@ public class DefaultLineDecoration extends LineDecoration {
     }
 
     @Override
-    public void onLineDraw(Canvas canvas, TextLine textLine, int width, int height) {
+    public void onLineDraw(Canvas canvas, TextLine textLine, int width) {
     }
 
     @Override
-    public void onParagraphLineDraw(Canvas canvas, TextLine textLine, int width, int height) {
+    public void onParagraphLineDraw(Canvas canvas, TextLine textLine, int width) {
     }
 
 

@@ -45,13 +45,13 @@ public class HighlightLineDecoration extends LineDecoration {
     }
 
     @Override
-    public void onLineDraw(Canvas canvas, TextLine textLine,int width,int height) {
+    public void onLineDraw(Canvas canvas, TextLine textLine,int width) {
         int decoratedScrollLineBottom = textLine.getDecoratedScrollLineBottom();
         canvas.drawLine(0f,decoratedScrollLineBottom*1f, width,decoratedScrollLineBottom*1f, linePaint);
     }
 
     @Override
-    public void onParagraphLineDraw(Canvas canvas, TextLine textLine,int width,int height) {
+    public void onParagraphLineDraw(Canvas canvas, TextLine textLine,int width) {
         if(textLine.isBreakLine()){
             //中间分隔线
             int lineLeft = textLine.getDecoratedLeft();

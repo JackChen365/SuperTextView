@@ -30,13 +30,13 @@ public abstract class LineDecoration {
      * 行绘制信息
      * @param canvas
      */
-    public abstract void onLineDraw(Canvas canvas, TextLine textLine,int width,int height);
+    public abstract void onLineDraw(Canvas canvas, TextLine textLine,int width);
 
     /**
      * 段落行绘制信息
      * @param canvas
      */
-    public abstract void onParagraphLineDraw(Canvas canvas, TextLine textLine,int width,int height);
+    public abstract void onParagraphLineDraw(Canvas canvas, TextLine textLine,int width);
 
 
 }

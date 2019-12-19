@@ -3,6 +3,7 @@ package com.cz.widget.supertextview.library.animation.impl;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Region;
 
 import com.cz.widget.supertextview.library.animation.AnimationLetter;
@@ -16,7 +17,7 @@ import com.cz.widget.supertextview.library.animation.ITextAnimator;
 public class TranslationYTextAnimator implements ITextAnimator {
     @Override
     public Animator getEnterAnimator(AnimationLetter animationLetter) {
-        Rect bounds = animationLetter.getBounds();
+        RectF bounds = animationLetter.getBounds();
         animationLetter.setTranslationY(-bounds.height());
         animationLetter.setClipRect(bounds, Region.Op.INTERSECT);
         ObjectAnimator valueAnimator = ObjectAnimator.ofFloat(animationLetter,"translationY",0);
@@ -25,7 +26,7 @@ public class TranslationYTextAnimator implements ITextAnimator {
 
     @Override
     public Animator getExitAnimator(AnimationLetter animationLetter) {
-        Rect bounds = animationLetter.getBounds();
+        RectF bounds = animationLetter.getBounds();
         animationLetter.setClipRect(bounds, Region.Op.INTERSECT);
         ObjectAnimator valueAnimator = ObjectAnimator.ofFloat(animationLetter,"translationY",bounds.height());
         return valueAnimator;

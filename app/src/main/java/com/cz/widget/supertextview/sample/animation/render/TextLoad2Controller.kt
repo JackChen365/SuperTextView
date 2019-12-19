@@ -14,7 +14,7 @@ class TextLoad2Controller: AbsAnimationTextRender() {
 
     override fun getEnterAnimator(animationLetters:List<AnimationLetter>): Animator {
         val animatorSet=AnimatorSet()
-        animationLetters?.filter { it.latter=='.' }?.forEachIndexed { index, element ->
+        animationLetters.filter { it.latter=='.' }.forEachIndexed { index, element ->
             val animator = ObjectAnimator.ofInt(element,"alpha",0x0,0xFF)
             animator.duration=600
             animator.startDelay=index*200L

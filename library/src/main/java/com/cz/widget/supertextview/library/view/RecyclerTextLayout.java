@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Build;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -57,7 +58,7 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
     /**
      * 文本排版layout对象
      */
-    private Layout layout;
+    private RecyclerStaticLayout layout;
     /**
      * 文本渲染器
      */
@@ -140,8 +141,18 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
             ViewSpan[] viewSpans = spannableString.getSpans(0, text.length(), ViewSpan.class);
             for(int i=0;i<viewSpans.length;i++){
                 ViewSpan viewSpan = viewSpans[i];
-                View view = viewSpan.getView();
-                addViewInternal(viewSpan,view);
+                View child = viewSpan.getView();
+                //添加view
+                LayoutParams params = child.getLayoutParams();
+                if (params == null) {
+                    params = generateDefaultLayoutParams();
+                    if (params == null) {
+                        throw new IllegalArgumentException("generateDefaultLayoutParams() cannot return null");
+                    }
+                }
+                FlowLayoutParams flowLayoutParams = (FlowLayoutParams) params;
+                flowLayoutParams.viewSpan=viewSpan;
+                viewSpan.setParentView(this);
             }
         }
         requestLayout();
@@ -154,9 +165,6 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        long st=System.currentTimeMillis();
-        //测量子孩子尺寸
-        measureChildren(widthMeasureSpec,heightMeasureSpec);
         //初始化Layout
         int measuredWidth = getMeasuredWidth();
         int measuredHeight = getMeasuredHeight();
@@ -169,6 +177,7 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
             //文本不同重新初始化
             if(null==layout||text!=layout.getText()){
                 layout = new RecyclerStaticLayout(text, textPaint, lineDecoration,textRender, outerWidth,outerHeight, 0f, Gravity.CENTER);
+                layout.setMeasureSpecs(widthMeasureSpec,heightMeasureSpec);
             } else if(outerHeight!=layout.getLayoutHeight()){
                 //外部高度变化,重新加载
 //                layout.setLayoutHeight(outerHeight);
@@ -179,24 +188,6 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
             final int layoutHeight=layout.getHeight();
             setMeasuredDimension(measuredWidth,getPaddingTop()+layoutHeight+getPaddingBottom());
         }
-    }
-
-    /**
-     * 内部添加view,不允许外部添加
-     * @param child
-     */
-    private void addViewInternal(ViewSpan viewSpan,View child) {
-        //添加view
-        LayoutParams params = child.getLayoutParams();
-        if (params == null) {
-            params = generateDefaultLayoutParams();
-            if (params == null) {
-                throw new IllegalArgumentException("generateDefaultLayoutParams() cannot return null");
-            }
-        }
-        FlowLayoutParams flowLayoutParams = (FlowLayoutParams) params;
-        flowLayoutParams.viewSpan=viewSpan;
-        super.addView(child, -1, params);
     }
 
     @Override
@@ -420,7 +411,7 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
         } else if(MotionEvent.ACTION_CANCEL==action){
             releaseDrag();
         }
-        return isBeingDragged;
+        return true;
     }
 
     /**

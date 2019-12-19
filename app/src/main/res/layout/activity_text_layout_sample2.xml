@@ -7,8 +7,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:orientation="horizontal">
 
         <com.cz.widget.supertextview.library.view.TextLayout
             android:id="@+id/textLayout"

@@ -11,7 +11,11 @@ import com.cz.widget.supertextview.library.style.ReplacementSpan;
 public class DefaultTextRender extends TextRender {
 
     @Override
-    public void removeTextLine(CharSequence source, int start, int end) {
+    public void addText(CharSequence text, int start, int end, float x, float y, TextPaint textPaint) {
+    }
+
+    @Override
+    public void removeText(CharSequence source, int start, int end) {
     }
 
     @Override

@@ -17,7 +17,7 @@ import com.cz.widget.supertextview.library.animation.ITextAnimator;
 public class TranslationXTextAnimator implements ITextAnimator {
     @Override
     public Animator getEnterAnimator(AnimationLetter animationLetter) {
-        Rect bounds = animationLetter.getBounds();
+        RectF bounds = animationLetter.getBounds();
         animationLetter.setTranslationX(-bounds.width());
         animationLetter.setClipRect(bounds, Region.Op.INTERSECT);
         ObjectAnimator valueAnimator = ObjectAnimator.ofFloat(animationLetter,"translationX",0);
@@ -27,7 +27,7 @@ public class TranslationXTextAnimator implements ITextAnimator {
 
     @Override
     public Animator getExitAnimator(AnimationLetter animationLetter) {
-        Rect bounds = animationLetter.getBounds();
+        RectF bounds = animationLetter.getBounds();
         animationLetter.setClipRect(bounds, Region.Op.INTERSECT);
         ObjectAnimator valueAnimator = ObjectAnimator.ofFloat(animationLetter,"translationX",bounds.width());
         return valueAnimator;

@@ -308,10 +308,10 @@ public class TextLine {
      * @param paint
      * @param workPaint
      */
-    public void draw(Canvas canvas, TextRender textRender,CharSequence text, TextPaint paint, TextPaint workPaint, int outerWidth, int outerHeight, boolean lineDecorate){
+    public void draw(Canvas canvas, TextRender textRender,CharSequence text, TextPaint paint, TextPaint workPaint, int outerWidth, boolean lineDecorate){
         if(lineDecorate){
             //绘制行装饰器
-            lineDecoration.onLineDraw(canvas,this, outerWidth, outerHeight);
+            lineDecoration.onLineDraw(canvas,this, outerWidth);
         }
         //绘制文本
         int decoratedLineBottom = getDecoratedScrollLineBottom();

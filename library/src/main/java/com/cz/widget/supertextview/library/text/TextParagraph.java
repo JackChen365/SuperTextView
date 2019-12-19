@@ -104,7 +104,7 @@ public class TextParagraph extends TextLine{
     }
 
     @Override
-    public void draw(Canvas canvas, TextRender textRender,CharSequence text, TextPaint paint, TextPaint workPaint, int outerWidth, int outerHeight, boolean lineDecorate) {
+    public void draw(Canvas canvas, TextRender textRender,CharSequence text, TextPaint paint, TextPaint workPaint, int outerWidth, boolean lineDecorate) {
         if(0 < lineCount){
             canvas.save();
             int lineTop = getLineTop();
@@ -115,14 +115,13 @@ public class TextParagraph extends TextLine{
 //            lineDecoration.onLineDraw(canvas,this,outerWidth,outerHeight);
             for(int i=0;i<lineCount;i++){
                 TextLine textLine = textLines[i];
-                int textLineTop = textLine.getLineTop();
                 int textLineBottom = textLine.getLineBottom();
                 //顶部/底部 超出的不用绘制
-                if(0 <= scrollLineTop+textLineBottom && outerHeight >= scrollLineTop+textLineTop){
+                if(0 <= scrollLineTop+textLineBottom){
                     //绘装饰器
-                    lineDecoration.onParagraphLineDraw(canvas,textLine,outerWidth,outerHeight);
+                    lineDecoration.onParagraphLineDraw(canvas,textLine,outerWidth);
                     //绘文本行
-                    textLine.draw(canvas,textRender,text,paint,workPaint,outerWidth,outerHeight,false);
+                    textLine.draw(canvas,textRender,text,paint,workPaint,outerWidth,false);
                 }
             }
             canvas.restore();

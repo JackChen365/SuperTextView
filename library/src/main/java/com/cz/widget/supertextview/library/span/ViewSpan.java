@@ -102,6 +102,10 @@ public class ViewSpan extends ReplacementSpan {
         }
     }
 
+    public void setParentView(ViewGroup parentView) {
+        this.parentView = parentView;
+    }
+
     public void setLayoutLeft(int layoutLeft){
         this.layoutLeft=layoutLeft;
     }

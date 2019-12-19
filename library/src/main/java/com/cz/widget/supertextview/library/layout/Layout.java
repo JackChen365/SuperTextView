@@ -22,12 +22,12 @@ import com.cz.widget.supertextview.library.render.TextRender;
  */
 public abstract class Layout {
     private static final String TAG="Layout";
-    protected CharSequence text;
-    private TextPaint paint;
+    CharSequence text;
+    TextPaint paint;
+    TextRender textRender;
     TextPaint workPaint;
-    private int width;
+    int width;
     private float spacingAdd;
-    private TextRender textRender;
     private Spanned spanned;
     private boolean spannedText;
 
@@ -370,5 +370,7 @@ public abstract class Layout {
                 Styled.drawText(c,textRender, buf, start, end, x, lineTop, baseline, lineBottom, paint, workPaint, lineGravity,false);
             }
         }
+        //绘制其他元素
+        textRender.onDraw(c);
     }
 }

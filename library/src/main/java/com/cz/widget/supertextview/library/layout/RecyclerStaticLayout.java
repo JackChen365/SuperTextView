@@ -6,10 +6,9 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.util.Log;
 import android.util.SparseArray;
-import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.cz.widget.supertextview.library.Styled;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
@@ -18,6 +17,7 @@ import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.span.ViewSpan;
 import com.cz.widget.supertextview.library.style.MetricAffectingSpan;
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
+import com.cz.widget.supertextview.library.text.Paragraph;
 import com.cz.widget.supertextview.library.text.TextLine;
 import com.cz.widget.supertextview.library.text.TextParagraph;
 import com.cz.widget.supertextview.library.utils.ArrayUtils;
@@ -62,6 +62,8 @@ public class RecyclerStaticLayout extends Layout {
     private char[] charArrays;
     private float[] widths;
     private Paint.FontMetricsInt fontMetricsInt;
+    private int widthMeasuredMode= View.MeasureSpec.EXACTLY;
+    private int heightMeasuredMode= View.MeasureSpec.EXACTLY;
     //行装饰器
     private LineDecoration lineDecoration;
     private TextRender textRender;
@@ -137,7 +139,7 @@ public class RecyclerStaticLayout extends Layout {
         int end = TextUtilsCompat.indexOf(source, '\n', bufferStart, bufferEnd);
         if (end < 0)
             end = bufferEnd;
-        int firstWidth = outerWidth;
+        int width = outerWidth;
 
         if (end - start > chs.length) {
             chs = new char[ArrayUtils.idealCharArraySize(end - start)];
@@ -151,8 +153,6 @@ public class RecyclerStaticLayout extends Layout {
         TextUtilsCompat.getChars(source, start, end, chs, 0);
 //        setReplacementSpanWord(source,start,end,chs);
         CharSequence sub = source;
-
-        int width = firstWidth;
         int lineLayoutMode=ReplacementSpan.FLOW;
         //段落计算信息
         Paragraph paragraph=new Paragraph(index);
@@ -185,6 +185,8 @@ public class RecyclerStaticLayout extends Layout {
                 ReplacementSpan replacementSpan = findReplacementSpan(i, next);
                 if(null!=replacementSpan){
                     lineLayoutMode=replacementSpan.getSpanLayoutMode();
+                    //测量viewSpan
+                    measureViewSpan(replacementSpan);
                     // 如果当前大小排版超出范围,则换到下一行
                     int replacementSpanWidth = replacementSpan.getSize(paint, source.subSequence(i,next), i, next, paragraphLayoutInfo.paragraphFontMetrics);
                     int replacementSpanHeight = paragraphLayoutInfo.paragraphFontMetrics.bottom - paragraphLayoutInfo.paragraphFontMetrics.top;
@@ -413,7 +415,6 @@ public class RecyclerStaticLayout extends Layout {
         decorationTmpRect.setEmpty();
         return paragraph;
     }
-
 
     /**
      * 输出行信息
@@ -835,8 +836,14 @@ public class RecyclerStaticLayout extends Layout {
      * 填空指定行信息
      */
     protected void onNewTextLineFilled(TextLine textLine){
-        //排版子控件，其他操作也可以在这里进行
+        //排版子控件
         textLine.layoutViewSpan(source,0,0);
+        //回调文本渲染
+        int lineStart = textLine.getLineStart();
+        int lineEnd = textLine.getLineEnd();
+        int lineLeft = textLine.getLineLeft();
+        int lineTop = textLine.getDecoratedLineTop();
+        Styled.preTextRender(textRender,paint,workPaint,source,lineStart,lineEnd,lineLeft,lineTop);
     }
 
     /**
@@ -942,7 +949,7 @@ public class RecyclerStaticLayout extends Layout {
         TextLine textLine = textLines[index];
         int start = textLine.getLineStart();
         int end = textLine.getLineEnd();
-        textRender.removeTextLine(source,start,end);
+        textRender.removeText(source,start,end);
         //移除viewSpan
         if(source instanceof Spanned){
             Spanned spanned = (Spanned) this.source;
@@ -1004,6 +1011,19 @@ public class RecyclerStaticLayout extends Layout {
     }
 
     /**
+     * 测量viewSpan
+     * @param replacementSpan
+     */
+    private void measureViewSpan(ReplacementSpan replacementSpan) {
+        if(null!=replacementSpan&&replacementSpan instanceof ViewSpan){
+            ViewSpan viewSpan = (ViewSpan) replacementSpan;
+            View view = viewSpan.getView();
+            //动态测量控件
+            measureChild(view,0,0);
+        }
+    }
+
+    /**
      * 排版ViewSpan
      * @param replacementSpan
      * @param left
@@ -1020,6 +1040,77 @@ public class RecyclerStaticLayout extends Layout {
             viewSpan.setLayoutLeft((int) left);
             viewSpan.setLayoutTop((int) layoutTop);
         }
+    }
+
+    public void setMeasureSpecs(int wSpec, int hSpec) {
+        widthMeasuredMode = View.MeasureSpec.getMode(wSpec);
+        widthMeasuredMode = View.MeasureSpec.getMode(hSpec);
+    }
+
+    public void measureChild(View child, int widthUsed, int heightUsed) {
+        final ViewGroup.LayoutParams lp = child.getLayoutParams();
+        final int widthSpec = getChildMeasureSpec(getWidth(), widthMeasuredMode, widthUsed, lp.width, false);
+        final int heightSpec = getChildMeasureSpec(getHeight(), widthMeasuredMode, heightUsed, lp.height, true);
+        child.measure(widthSpec, heightSpec);
+    }
+
+
+    /**
+     * Calculate a MeasureSpec value for measuring a child view in one dimension.
+     *
+     * @param parentSize Size of the parent view where the child will be placed
+     * @param parentMode The measurement spec mode of the parent
+     * @param padding Total space currently consumed by other elements of parent
+     * @param childDimension Desired size of the child view, or MATCH_PARENT/WRAP_CONTENT.
+     *                       Generally obtained from the child view's LayoutParams
+     * @param canScroll true if the parent RecyclerView can scroll in this dimension
+     *
+     * @return a MeasureSpec value for the child view
+     */
+    public static int getChildMeasureSpec(int parentSize, int parentMode, int padding,
+                                          int childDimension, boolean canScroll) {
+        int size = Math.max(0, parentSize - padding);
+        int resultSize = 0;
+        int resultMode = 0;
+        if (canScroll) {
+            if (childDimension >= 0) {
+                resultSize = childDimension;
+                resultMode = View.MeasureSpec.EXACTLY;
+            } else if (childDimension == ViewGroup.LayoutParams.MATCH_PARENT) {
+                switch (parentMode) {
+                    case View.MeasureSpec.AT_MOST:
+                    case View.MeasureSpec.EXACTLY:
+                        resultSize = size;
+                        resultMode = parentMode;
+                        break;
+                    case View.MeasureSpec.UNSPECIFIED:
+                        resultSize = 0;
+                        resultMode = View.MeasureSpec.UNSPECIFIED;
+                        break;
+                }
+            } else if (childDimension == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                resultSize = 0;
+                resultMode = View.MeasureSpec.UNSPECIFIED;
+            }
+        } else {
+            if (childDimension >= 0) {
+                resultSize = childDimension;
+                resultMode = View.MeasureSpec.EXACTLY;
+            } else if (childDimension == ViewGroup.LayoutParams.MATCH_PARENT) {
+                resultSize = size;
+                resultMode = parentMode;
+            } else if (childDimension == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                resultSize = size;
+                if (parentMode == View.MeasureSpec.AT_MOST || parentMode == View.MeasureSpec.EXACTLY) {
+                    resultMode = View.MeasureSpec.AT_MOST;
+                } else {
+                    resultMode = View.MeasureSpec.UNSPECIFIED;
+                }
+
+            }
+        }
+        //noinspection WrongConstant
+        return View.MeasureSpec.makeMeasureSpec(resultSize, resultMode);
     }
 
     public int getLineCount() {
@@ -1256,9 +1347,11 @@ public class RecyclerStaticLayout extends Layout {
             for(int i=0;i<lineCount;i++){
                 TextLine textLine = textLines[i];
                 //绘制行信息
-                textLine.draw(c,textRender,source,paint,workPaint,width,height,true);
+                textLine.draw(c,textRender,source,paint,workPaint,width,true);
             }
         }
+        //绘制其他元素
+        textRender.onDraw(c);
     }
 
     /**
@@ -1289,57 +1382,6 @@ public class RecyclerStaticLayout extends Layout {
          * 当前操作条目方向
          */
         int itemDirection= DIRECTION_END;
-    }
-
-    /**
-     * 段落信息
-     */
-    public class Paragraph{
-        /**
-         * 当前段落
-         */
-        private final int index;
-        /**
-         * 当前段落行总数
-         */
-        private int lineCount=0;
-        /**
-         * 段落内行信息
-         */
-        private TextLine[] textLines;
-
-        private TextParagraph textParagraph;
-
-        public Paragraph(int index) {
-            this.index = index;
-        }
-
-        /**
-         * 返回指定行起始字符
-         * @param line
-         * @return
-         */
-        public int getLineLatterStart(int line) {
-            return textLines[line].getLineStart();
-        }
-
-        /**
-         * 返回行结束字符
-         * @param line
-         * @return
-         */
-        public final int getLineLatterEnd(int line) {
-            return textLines[line].getLineEnd();
-        }
-
-        /**
-         * 获得行所占宽
-         * @param line
-         * @return
-         */
-        public int getLineHeight(int line){
-            return textLines[line].getLineHeight();
-        }
     }
 
     /**

@@ -14,10 +14,10 @@ import com.cz.widget.supertextview.library.animation.AnimationLetter
  */
 class WindowsTextLoadController: AbsAnimationTextRender() {
 
-    override fun getEnterAnimator(animationLetters:List<AnimationLetter>?): Animator {
+    override fun getEnterAnimator(animationLetters:List<AnimationLetter>): Animator {
         val animatorSet=AnimatorSet()
-        animationLetters?.forEachIndexed{ index,animationLetter->
-            val leftPadding = 0
+        animationLetters.forEachIndexed{ index,animationLetter->
+            val leftPadding = leftPadding
             val bounds = animationLetter.bounds
             val left=leftPadding+bounds.left
             val frame1= Keyframe.ofFloat(0f, (-bounds.width()).toFloat())
@@ -43,5 +43,6 @@ class WindowsTextLoadController: AbsAnimationTextRender() {
     }
 
     override fun onDraw(canvas: Canvas?) {
+
     }
 }
