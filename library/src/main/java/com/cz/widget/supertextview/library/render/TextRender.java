@@ -8,6 +8,7 @@ import com.cz.widget.supertextview.library.style.ReplacementSpan;
 
 /**
  * 文本渲染器
+ * 可用于扩展自定义规则渲染
  */
 public abstract class TextRender {
 
@@ -43,7 +44,7 @@ public abstract class TextRender {
      * @param y
      * @param textPaint
      */
-    public abstract void addText(CharSequence text, int start, int end, float x, float y, TextPaint textPaint);
+    public abstract void addText(CharSequence text, int start, int end, float x, float y,float textWidth,TextPaint textPaint);
     /**
      * 移除文本信息
      * @param source
@@ -53,6 +54,19 @@ public abstract class TextRender {
     public abstract void removeText(CharSequence source, int start, int end);
 
     /**
+     * 添加添加信息
+     * @param span
+     * @param x
+     * @param y
+     */
+    public abstract void addReplacementSpan(ReplacementSpan span,CharSequence text, int start, int end, float x, float y,float width,TextPaint textPaint);
+
+    /**
+     * 移除span信息信息
+     */
+    public abstract void removeSpan(ReplacementSpan span,CharSequence source, int start, int end);
+
+    /**
      * 绘制span元素
      * @param canvas
      * @param replacementSpan
@@ -60,13 +74,10 @@ public abstract class TextRender {
      * @param start
      * @param end
      * @param x
-     * @param top
      * @param y
-     * @param bottom
      * @param textPaint
      */
-    public abstract void drawReplacementSpan(Canvas canvas, ReplacementSpan replacementSpan,CharSequence text, int start, int end, float x,
-                                             int top, int y, int bottom,TextPaint textPaint);
+    public abstract void drawReplacementSpan(Canvas canvas, TextPaint textPaint,TextPaint workPaint,ReplacementSpan replacementSpan,CharSequence text, int start, int end, float x, float y);
 
     /**
      * 绘制文本信息
@@ -78,7 +89,7 @@ public abstract class TextRender {
      * @param y
      * @param textPaint
      */
-    public abstract void drawText(Canvas canvas,CharSequence text, int start, int end,float x,float y, TextPaint textPaint);
+    public abstract void drawText(Canvas canvas,TextPaint textPaint,TextPaint workPaint,CharSequence text, int start, int end,float x,float y);
 
     /**
      * 绘制其他元素

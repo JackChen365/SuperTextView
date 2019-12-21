@@ -1,4 +1,4 @@
-package com.cz.widget.supertextview.sample.version1
+package com.cz.widget.supertextview.sample.layout
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -7,7 +7,6 @@ import android.graphics.BlurMaskFilter
 import android.graphics.Color
 import android.graphics.EmbossMaskFilter
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spannable
 import android.view.LayoutInflater
@@ -53,7 +52,7 @@ class TextLayoutSample3Activity : ToolBarActivity() {
         val spanCount=10+Random.nextInt(10)
 //        val text=(0 until spanCount*2).
 //            map { DataProvider.ITEMS[DataProvider.RANDOM.nextInt(DataProvider.ITEMS.size)] }.joinToString(" ")
-        val text=assets.open("Little Prince小王子.txt").bufferedReader().readText()
+        val text=assets.open("dynamic_chapter1").bufferedReader().readText()
         val spannableString=SpannableString(text)
 //        初始化span
         var start=0

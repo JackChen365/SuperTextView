@@ -97,22 +97,21 @@ public class Styled
                 if (needWidth) {
                     ret = workPaint.measureText(tmp, tmpstart, tmpend);
                 }
-                //这里根据方向动态决定位置
-                if(Gravity.TOP==textGravity){
-                    textRender.drawText(canvas,tmp,tmpstart,tmpend,x, top-workPaint.ascent() + workPaint.baselineShift,workPaint);
-                } else if(Gravity.CENTER==textGravity){
-                    float textY=(bottom-top) / 2 + (workPaint.descent()-workPaint.ascent()) / 2 - workPaint.descent();
-                    textRender.drawText(canvas,tmp,tmpstart,tmpend, x, top + textY + workPaint.baselineShift,workPaint);
-                } else {
-                    canvas.drawText(tmp, tmpstart, tmpend, x, y + workPaint.baselineShift, workPaint);
-                    textRender.drawText(canvas,tmp,tmpstart,tmpend, x, y + workPaint.baselineShift,workPaint);
-                }
+                textRender.drawText(canvas,paint,workPaint,tmp,tmpstart,tmpend, x, y + workPaint.baselineShift);
             }
         } else {
             ret = replacement.getSize(workPaint, text, start, end, fmi);
             if (canvas != null) {
-                textRender.drawReplacementSpan(canvas, replacement,text, start, end,
-                        x, top, y, bottom, workPaint);
+                if(Gravity.TOP==textGravity){
+                    y = top;
+                    textRender.drawReplacementSpan(canvas,paint,workPaint, replacement,text, start, end, x, y);
+                } else if(Gravity.CENTER==textGravity){
+                    y = top + ((bottom-top)-(fmi.descent-fmi.ascent)) /2;
+                    textRender.drawReplacementSpan(canvas,paint,workPaint, replacement,text, start, end, x, y);
+                } else {
+                    y= (int) (bottom-(workPaint.descent()-workPaint.ascent()));
+                    textRender.drawReplacementSpan(canvas, paint,workPaint,replacement,text, start, end, x, y);
+                }
             }
         }
         return ret;
@@ -268,12 +267,13 @@ public class Styled
     public static float drawText(Canvas canvas, TextRender textRender,
                                        CharSequence text, int start, int end,
                                        float x, int top, int y, int bottom,
+                                       Paint.FontMetricsInt fmi,
                                        TextPaint paint,
                                        TextPaint workPaint,
                                        int lineGravity,
                                        boolean needWidth) {
         return drawDirectionalRun(canvas,textRender,text, start, end,
-                       x, top, y, bottom, null, paint, workPaint,
+                       x, top, y, bottom, fmi, paint, workPaint,
                        lineGravity,needWidth);
     }
 
@@ -331,20 +331,20 @@ public class Styled
     }
 
     /**
-     * 排版文本时
+     * 添加文本时
      * @param text
      * @param start
      * @param end
      */
-    public static void preTextRender(TextRender textRender,TextPaint paint,
-                                     TextPaint workPaint, CharSequence text, int start, int end,int x,int y){
+    public static void onTextLineAdded(TextRender textRender, TextPaint paint,
+                                       TextPaint workPaint, CharSequence text, int start, int end, int x, int y){
         Spanned spanned=(Spanned)text;
         int next;
         int left=x;
         int from=start;
         for (int i = start; i < end; i = next) {
-            next = spanned.nextSpanTransition(i, end, MetricAffectingSpan.class);
-            CharacterStyle[] spans = spanned.getSpans(start, end, CharacterStyle.class);
+            next = spanned.nextSpanTransition(i, end, CharacterStyle.class);
+            CharacterStyle[] spans = spanned.getSpans(i, next, CharacterStyle.class);
             ReplacementSpan replacement = null;
             paint.bgColor = 0;
             paint.baselineShift = 0;
@@ -358,17 +358,51 @@ public class Styled
                 }
             }
             if (replacement == null) {
-                x += workPaint.measureText(text, start, end);
+                x += workPaint.measureText(text, i, next);
+                textRender.addText(text,i,next,left,y,x-left,workPaint);
             } else {
-                x += replacement.getSize(workPaint, text, start, end, null);
-                textRender.addText(text,from,next,left,y,workPaint);
-                left=x;
-                from=next;
+                x += replacement.getSize(workPaint, text, i,next, null);
+                textRender.addReplacementSpan(replacement,text, i,next,left,y,x-left,workPaint);
             }
+            left=x;
+            from=next;
         }
         //回调最后一次
         if(from!=end){
-            textRender.addText(text,from,end,left,y,workPaint);
+            textRender.addText(text,from,end,left,y,x-left,workPaint);
+        }
+    }
+
+    /**
+     * 添加文本时
+     * @param text
+     * @param start
+     * @param end
+     */
+    public static void onTextLineRemoved(TextRender textRender, CharSequence text, int start, int end){
+        Spanned spanned=(Spanned)text;
+        int next;
+        int from=start;
+        for (int i = start; i < end; i = next) {
+            next = spanned.nextSpanTransition(i, end, MetricAffectingSpan.class);
+            CharacterStyle[] spans = spanned.getSpans(start, end, CharacterStyle.class);
+            ReplacementSpan replacement = null;
+            for (int s = 0; s < spans.length; s++) {
+                CharacterStyle span = spans[s];
+                if (span instanceof ReplacementSpan) {
+                    replacement = (ReplacementSpan)span;
+                }
+            }
+            if (replacement == null) {
+                textRender.removeText(text,from,next);
+            } else {
+                textRender.removeSpan(replacement,text,from,next);
+            }
+            from=next;
+        }
+        //回调最后一次
+        if(from!=end){
+            textRender.removeText(text,from,end);
         }
     }
 }

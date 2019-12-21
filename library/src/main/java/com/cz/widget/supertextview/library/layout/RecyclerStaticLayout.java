@@ -61,7 +61,6 @@ public class RecyclerStaticLayout extends Layout {
     private ParagraphRecyclerPool recyclerPool=new ParagraphRecyclerPool();
     private char[] charArrays;
     private float[] widths;
-    private Paint.FontMetricsInt fontMetricsInt;
     private int widthMeasuredMode= View.MeasureSpec.EXACTLY;
     private int heightMeasuredMode= View.MeasureSpec.EXACTLY;
     //行装饰器
@@ -93,7 +92,6 @@ public class RecyclerStaticLayout extends Layout {
         this.textAlign = textAlign;
         this.textRender=textRender;
         this.lineDecoration=lineDecoration;
-        this.fontMetricsInt = new Paint.FontMetricsInt();
         this.textLines = new TextLine[3];
         int end = TextUtilsCompat.indexOf(source, '\n', 0, source.length());
         int bufferSize = end >= 0 ? end: source.length() - end;
@@ -127,7 +125,7 @@ public class RecyclerStaticLayout extends Layout {
      * @return
      */
     Paragraph fillParagraphText(int index,CharSequence source, int bufferStart, int bufferEnd,
-                           TextPaint paint, int outerWidth, float spacingAdd, int align) {
+                                TextPaint paint, int outerWidth, float spacingAdd, int align) {
         Paint.FontMetricsInt fm = fontMetricsInt;
         char[] chs = charArrays;
         float[] widths = this.widths;
@@ -140,7 +138,6 @@ public class RecyclerStaticLayout extends Layout {
         if (end < 0)
             end = bufferEnd;
         int width = outerWidth;
-
         if (end - start > chs.length) {
             chs = new char[ArrayUtils.idealCharArraySize(end - start)];
             charArrays = chs;
@@ -247,9 +244,11 @@ public class RecyclerStaticLayout extends Layout {
                             float lineHeight= (paragraphFontMetrics.descent - paragraphFontMetrics.ascent);
                             textParagraph.setLineDescent(paragraphFontMetrics.descent);
                             textParagraph.setLineBottom((int) (v+lineHeight));
-                            textParagraph.setParagraphLine(paragraph.lineCount);
                             textParagraph.setParagraph(paragraph.index);
+                            textParagraph.setParagraphLine(paragraph.lineCount);
                             textParagraph.setRect(decorationTmpRect.left,decorationTmpRect.top,decorationTmpRect.right,decorationTmpRect.bottom);
+                            //段落内部行，不需要添加外围装饰尺寸
+                            v-=decorationTmpRect.top;
                             //记录初始段落信息
                             paragraph.textParagraph=textParagraph;
                             paragraph.textLines[paragraph.lineCount]=textParagraph;
@@ -263,11 +262,20 @@ public class RecyclerStaticLayout extends Layout {
                             here = i;
                         }
                         //输出行信息
-                        lineDecoration.getParagraphLineOffsets(paragraph.textParagraph,paragraph.lineCount, decorationTmpRect);
                         outTextLine(paragraph,here, next, paragraphFontMetrics.ascent, paragraphFontMetrics.descent, w, v,spacingAdd,align, decorationTmpRect,false);
                         layoutViewSpan(paragraph,replacementSpan, w,v);
+                        //开始分隔段落信息
+                        v+=decorationTmpRect.top;
+                        lineDecoration.getParagraphLineOffsets(paragraph.textParagraph,paragraph.lineCount, decorationTmpRect);
                         here = next;
                         ok = here;
+                    } else if(ReplacementSpan.isSingleLine(lineLayoutMode)){
+                        //单行标志,输出行信息
+                        Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, fm);
+                        lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                        v+=decorationTmpRect.top;
+                        outTextLine(paragraph,here, next, fm.ascent, fm.descent, w, v,spacingAdd,align, decorationTmpRect,false);
+                        layoutViewSpan(paragraph,replacementSpan, w,v);
                     } else {
                         layoutViewSpan(paragraph,replacementSpan, w,v);
                         Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, fm);
@@ -380,6 +388,7 @@ public class RecyclerStaticLayout extends Layout {
                         int decorationHeight= decorationTmpRect.top+decorationTmpRect.bottom;
                         if(v+decorationHeight+(fmDescent-fmAscent)+spacingAdd>= paragraphLayoutInfo.paragraphHeight){
                             //段落清除，重新运算行信息
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount-1, decorationTmpRect);
                             v+=(paragraphLayoutInfo.paragraphHeight-v)+decorationTmpRect.bottom;
                             lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
                             //清除数据
@@ -398,6 +407,16 @@ public class RecyclerStaticLayout extends Layout {
                 paragraphLayoutInfo.paragraphHeight=v+(paragraphLayoutInfo.paragraphFontMetrics.descent- paragraphLayoutInfo.paragraphFontMetrics.ascent);
                 lineLayoutMode = ReplacementSpan.FLOW;
                 w+=decorationTmpRect.left;
+            }
+            if(ReplacementSpan.isSingleLine(lineLayoutMode)){
+                lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                w = decorationTmpRect.left+paragraphLayoutInfo.paragraphLeftOffset;
+                v += (fm.descent - fm.ascent + spacingAdd + decorationTmpRect.bottom);
+                lineLayoutMode = ReplacementSpan.FLOW;
+                fitascent = fitdescent = fittop = fitbottom = 0;
+                okascent = okdescent = oktop = okbottom = 0;
+                here = next;
+                ok = here;
             }
         }
         if (end != here) {
@@ -839,11 +858,24 @@ public class RecyclerStaticLayout extends Layout {
         //排版子控件
         textLine.layoutViewSpan(source,0,0);
         //回调文本渲染
-        int lineStart = textLine.getLineStart();
-        int lineEnd = textLine.getLineEnd();
-        int lineLeft = textLine.getLineLeft();
-        int lineTop = textLine.getDecoratedLineTop();
-        Styled.preTextRender(textRender,paint,workPaint,source,lineStart,lineEnd,lineLeft,lineTop);
+        if(textLine instanceof TextParagraph){
+            TextParagraph textParagraph = (TextParagraph) textLine;
+            for(int i=0;i<textParagraph.lineCount;i++){
+                TextLine paragraphTextLine = textParagraph.textLines[i];
+                int lineStart = paragraphTextLine.getLineStart();
+                int lineEnd = paragraphTextLine.getLineEnd();
+                int lineLeft = paragraphTextLine.getLineLeft();
+                int lineTop = paragraphTextLine.getDecoratedLineTop();
+                Styled.onTextLineAdded(textRender,paint,workPaint,source,lineStart,lineEnd,lineLeft,lineTop);
+            }
+        } else {
+            //移除文本信息
+            int lineStart = textLine.getLineStart();
+            int lineEnd = textLine.getLineEnd();
+            int lineLeft = textLine.getLineLeft();
+            int lineTop = textLine.getDecoratedLineTop();
+            Styled.onTextLineAdded(textRender,paint,workPaint,source,lineStart,lineEnd,lineLeft,lineTop);
+        }
     }
 
     /**
@@ -947,14 +979,23 @@ public class RecyclerStaticLayout extends Layout {
     private void removeTextLineAt(int index) {
         //渲染通知停止
         TextLine textLine = textLines[index];
-        int start = textLine.getLineStart();
-        int end = textLine.getLineEnd();
-        textRender.removeText(source,start,end);
+        int lineLatterStart = textLine.getLineStart();
+        int lineLatterEnd = textLine.getLineEnd();
+        if(textLine instanceof TextParagraph){
+            TextParagraph textParagraph = (TextParagraph) textLine;
+            for(int i=0;i<textParagraph.lineCount;i++){
+                TextLine paragraphTextLine = textParagraph.textLines[i];
+                int paragraphTextStart = paragraphTextLine.getLineStart();
+                int paragraphTextEnd = paragraphTextLine.getLineEnd();
+                Styled.onTextLineRemoved(textRender,source,paragraphTextStart,paragraphTextEnd);
+            }
+        } else {
+            //移除文本信息
+            Styled.onTextLineRemoved(textRender,source,lineLatterStart,lineLatterEnd);
+        }
         //移除viewSpan
         if(source instanceof Spanned){
             Spanned spanned = (Spanned) this.source;
-            int lineLatterStart = getLineLatterStart(index);
-            int lineLatterEnd = getLineLatterEnd(index);
             ViewSpan[] viewSpans = spanned.getSpans(lineLatterStart, lineLatterEnd, ViewSpan.class);
             for(int i=0;i<viewSpans.length;i++){
                 //从父容器移除
@@ -1136,7 +1177,7 @@ public class RecyclerStaticLayout extends Layout {
     }
 
     public int getDecoratedDescent(int line) {
-        return textLines[line].getDecoratedScrollDescent();
+        return textLines[line].getScrollDescent();
     }
 
     @Override
@@ -1347,7 +1388,7 @@ public class RecyclerStaticLayout extends Layout {
             for(int i=0;i<lineCount;i++){
                 TextLine textLine = textLines[i];
                 //绘制行信息
-                textLine.draw(c,textRender,source,paint,workPaint,width,true);
+                textLine.draw(c,textRender,source,paint,workPaint,fontMetricsInt,width,true);
             }
         }
         //绘制其他元素

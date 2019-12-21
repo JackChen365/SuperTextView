@@ -54,6 +54,10 @@ public class TextLayout extends ViewGroup implements Callback {
      */
     private Layout layout;
     /**
+     * 设置文本方位
+     */
+    private int gravity=Gravity.CENTER;
+    /**
      * 文本渲染器
      */
     private TextRender textRender=new DefaultTextRender();
@@ -116,6 +120,10 @@ public class TextLayout extends ViewGroup implements Callback {
         this.textRender=textRender;
     }
 
+    public void setGravity(int gravity){
+        this.gravity=gravity;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -129,10 +137,10 @@ public class TextLayout extends ViewGroup implements Callback {
         if(null!=text){
             //文本不同重新初始化
             if(null==layout||text!=layout.getText()){
-                layout = new StaticLayout(text, textPaint, lineDecoration,textRender, outerWidth, 0f, Gravity.CENTER);
+                layout = new StaticLayout(text, textPaint, lineDecoration,textRender, outerWidth, 0f, gravity);
             } else if(outerHeight!=layout.getLayoutHeight()){
                 //外部高度变化,重新加载
-//                layout.setLayoutHeight(outerHeight);
+                layout.setLayoutHeight(outerHeight);
             }
         }
 //        //重新设置尺寸
@@ -201,7 +209,9 @@ public class TextLayout extends ViewGroup implements Callback {
      */
     public void clear(){
         this.text=null;
+        this.layout=null;
         removeAllViews();
+        requestLayout();
     }
 
     @Override
@@ -211,8 +221,6 @@ public class TextLayout extends ViewGroup implements Callback {
         if(null!=layout){
             canvas.save();
             canvas.translate(getPaddingLeft()*1f,getPaddingTop()*1f);
-            //绘制行装饰器
-//            lineDecoration.onLineDraw(canvas,this, width, height);
             layout.draw(canvas);
             canvas.restore();
         }

@@ -1,6 +1,7 @@
 package com.cz.widget.supertextview.library.text;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.text.TextPaint;
 
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
@@ -104,15 +105,16 @@ public class TextParagraph extends TextLine{
     }
 
     @Override
-    public void draw(Canvas canvas, TextRender textRender,CharSequence text, TextPaint paint, TextPaint workPaint, int outerWidth, boolean lineDecorate) {
+    public void draw(Canvas canvas, TextRender textRender, CharSequence text, TextPaint paint, TextPaint workPaint, Paint.FontMetricsInt fontMetricsInt, int outerWidth, boolean lineDecorate) {
         if(0 < lineCount){
+            //绘装饰器
+            LineDecoration lineDecoration = getLineDecoration();
+            lineDecoration.onLineDraw(canvas,this,outerWidth);
+            //绘制段落内文本行信息
             canvas.save();
             int lineTop = getLineTop();
             canvas.translate(0,lineTop);
-            LineDecoration lineDecoration = getLineDecoration();
             int scrollLineTop = getDecoratedScrollLineTop();
-            //绘装饰器
-//            lineDecoration.onLineDraw(canvas,this,outerWidth,outerHeight);
             for(int i=0;i<lineCount;i++){
                 TextLine textLine = textLines[i];
                 int textLineBottom = textLine.getLineBottom();
@@ -121,7 +123,7 @@ public class TextParagraph extends TextLine{
                     //绘装饰器
                     lineDecoration.onParagraphLineDraw(canvas,textLine,outerWidth);
                     //绘文本行
-                    textLine.draw(canvas,textRender,text,paint,workPaint,outerWidth,false);
+                    textLine.draw(canvas,textRender,text,paint,workPaint,fontMetricsInt,outerWidth,false);
                 }
             }
             canvas.restore();

@@ -128,7 +128,7 @@ public class ViewSpan extends ReplacementSpan {
     }
 
     @Override
-    public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top, int y, int bottom, Paint paint) {
+    public void draw(Canvas canvas, CharSequence text, int start, int end, float x, float y, Paint paint) {
         //暂不需要操作
     }
 }

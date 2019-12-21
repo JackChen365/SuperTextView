@@ -43,7 +43,7 @@ class SelectTextWordActivity : ToolBarActivity() {
         spanList.put("StrikethroughSpan 删除线（中划线）", StrikethroughSpan())
         spanList.put("UnderlineSpan 下划线", UnderlineSpan())
         spanList.put("AbsoluteSizeSpan 绝对大小（文本字体）", AbsoluteSizeSpan(20, true))
-        val drawableSpan = object : DynamicDrawableSpan(ALIGN_BASELINE) {
+        val drawableSpan = object : DynamicDrawableSpan() {
             override fun getDrawable(): Drawable {
                 val d = resources.getDrawable(R.mipmap.ic_launcher)
                 d.setBounds(0, 0, 50, 50)

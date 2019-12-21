@@ -1,6 +1,7 @@
 package com.cz.widget.supertextview.library.text;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -239,8 +240,16 @@ public class TextLine {
         return lineBottom+rect.bottom;
     }
 
-    public int getDecoratedScrollDescent() {
-        return scrollOffset+lineDescent;
+    public int getScrollDescent() {
+        return scrollOffset+(lineBottom-lineDescent);
+    }
+
+    public int getScrollTop() {
+        return scrollOffset+lineTop;
+    }
+
+    public int getScrollBottom() {
+        return scrollOffset+lineBottom;
     }
 
     public int getDecoratedLeft() {
@@ -308,20 +317,19 @@ public class TextLine {
      * @param paint
      * @param workPaint
      */
-    public void draw(Canvas canvas, TextRender textRender,CharSequence text, TextPaint paint, TextPaint workPaint, int outerWidth, boolean lineDecorate){
+    public void draw(Canvas canvas, TextRender textRender, CharSequence text, TextPaint paint, TextPaint workPaint, Paint.FontMetricsInt fontMetricsInt, int outerWidth, boolean lineDecorate){
         if(lineDecorate){
             //绘制行装饰器
             lineDecoration.onLineDraw(canvas,this, outerWidth);
         }
         //绘制文本
-        int decoratedLineBottom = getDecoratedScrollLineBottom();
-        int baseline = decoratedLineBottom-lineDescent;
+        int baseline = getScrollDescent();
         if (!(text instanceof Spanned)) {
             canvas.drawText(text, lineStart, lineEnd, lineLeft, baseline, paint);
         } else {
-            int top = getDecoratedScrollLineTop();
-            int bottom = getDecoratedScrollLineBottom();
-            Styled.drawText(canvas, textRender,text, lineStart, lineEnd, lineLeft, top, baseline, bottom, paint, workPaint, lineAlign,false);
+            int top = getScrollTop();
+            int bottom = getScrollBottom();
+            Styled.drawText(canvas, textRender,text, lineStart, lineEnd, lineLeft, top, baseline, bottom,fontMetricsInt,paint, workPaint, lineAlign,false);
         }
     }
 

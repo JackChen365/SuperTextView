@@ -6,7 +6,6 @@ import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 
 import com.cz.widget.supertextview.library.Styled;
@@ -23,8 +22,6 @@ import com.cz.widget.supertextview.library.utils.ArrayUtils;
 import com.cz.widget.supertextview.library.utils.TextUtilsCompat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,7 +39,6 @@ public class StaticLayout extends Layout {
     private TextLine[] textLines;
     private char[] charArrays;
     private float[] widths;
-    private Paint.FontMetricsInt fontMetricsInt;
     //行装饰器
     private LineDecoration lineDecoration;
     /**
@@ -55,12 +51,10 @@ public class StaticLayout extends Layout {
                         TextRender textRender, int width, float spacingAdd, int align) {
         super(source,paint,textRender, width, spacingAdd);
         this.lineDecoration=lineDecoration;
-        this.fontMetricsInt = new Paint.FontMetricsInt();
         //填充内容
         fillText(source, 0, source.length(), paint, width, spacingAdd, align);
         charArrays = null;
         widths = null;
-        fontMetricsInt = null;
     }
     /**
      * 填充内容
@@ -171,7 +165,6 @@ public class StaticLayout extends Layout {
                 ReplacementSpan replacementSpan = findReplacementSpan(i, next);
                 if(null!=replacementSpan){
                     lineLayoutMode=replacementSpan.getSpanLayoutMode();
-                    //测量viewSpan
                     // 如果当前大小排版超出范围,则换到下一行
                     int replacementSpanWidth = replacementSpan.getSize(paint, source.subSequence(i,next), i, next, paragraphLayoutInfo.paragraphFontMetrics);
                     int replacementSpanHeight = paragraphLayoutInfo.paragraphFontMetrics.bottom - paragraphLayoutInfo.paragraphFontMetrics.top;
@@ -232,9 +225,11 @@ public class StaticLayout extends Layout {
                             float lineHeight= (paragraphFontMetrics.descent - paragraphFontMetrics.ascent);
                             textParagraph.setLineDescent(paragraphFontMetrics.descent);
                             textParagraph.setLineBottom((int) (v+lineHeight));
-                            textParagraph.setParagraphLine(paragraph.lineCount);
                             textParagraph.setParagraph(paragraph.index);
+                            textParagraph.setParagraphLine(paragraph.lineCount);
                             textParagraph.setRect(decorationTmpRect.left,decorationTmpRect.top,decorationTmpRect.right,decorationTmpRect.bottom);
+                            //段落内部行，不需要添加外围装饰尺寸
+                            v-=decorationTmpRect.top;
                             //记录初始段落信息
                             paragraph.textParagraph=textParagraph;
                             paragraph.textLines[paragraph.lineCount]=textParagraph;
@@ -248,11 +243,20 @@ public class StaticLayout extends Layout {
                             here = i;
                         }
                         //输出行信息
-                        lineDecoration.getParagraphLineOffsets(paragraph.textParagraph,paragraph.lineCount, decorationTmpRect);
                         outTextLine(paragraph,here, next, paragraphFontMetrics.ascent, paragraphFontMetrics.descent, w, v,spacingAdd,align, decorationTmpRect,false);
                         layoutViewSpan(paragraph,replacementSpan, w,v);
+                        //开始分隔段落信息
+                        v+=decorationTmpRect.top;
+                        lineDecoration.getParagraphLineOffsets(paragraph.textParagraph,paragraph.lineCount, decorationTmpRect);
                         here = next;
                         ok = here;
+                    } else if(ReplacementSpan.isSingleLine(lineLayoutMode)){
+                        //单行标志,输出行信息
+                            Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, fm);
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                            v+=decorationTmpRect.top;
+                            outTextLine(paragraph,here, next, fm.ascent, fm.descent, w, v,spacingAdd,align, decorationTmpRect,false);
+                            layoutViewSpan(paragraph,replacementSpan, w,v);
                     } else {
                         layoutViewSpan(paragraph,replacementSpan, w,v);
                         Styled.getTextWidths(paint, workPaint, spanned, i, next, widths, fm);
@@ -365,6 +369,7 @@ public class StaticLayout extends Layout {
                         int decorationHeight= decorationTmpRect.top+decorationTmpRect.bottom;
                         if(v+decorationHeight+(fmDescent-fmAscent)+spacingAdd>= paragraphLayoutInfo.paragraphHeight){
                             //段落清除，重新运算行信息
+                            lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount-1, decorationTmpRect);
                             v+=(paragraphLayoutInfo.paragraphHeight-v)+decorationTmpRect.bottom;
                             lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
                             //清除数据
@@ -384,6 +389,16 @@ public class StaticLayout extends Layout {
                 lineLayoutMode = ReplacementSpan.FLOW;
                 w+=decorationTmpRect.left;
             }
+            if(ReplacementSpan.isSingleLine(lineLayoutMode)){
+                lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
+                w = decorationTmpRect.left+paragraphLayoutInfo.paragraphLeftOffset;
+                v += (fm.descent - fm.ascent + spacingAdd + decorationTmpRect.bottom);
+                lineLayoutMode = ReplacementSpan.FLOW;
+                fitascent = fitdescent = fittop = fitbottom = 0;
+                okascent = okdescent = oktop = okbottom = 0;
+                here = next;
+                ok = here;
+            }
         }
         if (end != here) {
             //处理断行内容
@@ -401,6 +416,27 @@ public class StaticLayout extends Layout {
         return paragraph;
     }
 
+    /**
+     * 将指定范围内replacementSpan 用空的占位字符\uFFFC替换
+     * @param source
+     * @param start
+     * @param end
+     * @param chs
+     */
+    private void setReplacementSpanWord(CharSequence source, int start, int end, char[] chs) {
+        if (source instanceof Spanned) {
+            Spanned sp = (Spanned) source;
+            ReplacementSpan[] spans = sp.getSpans(start, end, ReplacementSpan.class);
+            //减少ReplacementSpan运算
+            for (int y = 0; y < spans.length; y++) {
+                int a = sp.getSpanStart(spans[y]);
+                int b = sp.getSpanEnd(spans[y]);
+                for (int x = a; x < b; x++) {
+                    chs[x - start] = '\uFFFC';
+                }
+            }
+        }
+    }
 
     /**
      * 设置行装饰器
@@ -555,7 +591,7 @@ public class StaticLayout extends Layout {
     }
 
     public int getDecoratedDescent(int line) {
-        return textLines[line].getDecoratedScrollDescent();
+        return textLines[line].getScrollDescent();
     }
 
     @Override
@@ -589,7 +625,7 @@ public class StaticLayout extends Layout {
             for(int i=0;i<lineCount;i++){
                 TextLine textLine = textLines[i];
                 //绘制行信息
-                textLine.draw(c,textRender,text,paint,workPaint,width,true);
+                textLine.draw(c,textRender,text,paint,workPaint,fontMetricsInt,width,true);
             }
         }
         //绘制其他元素

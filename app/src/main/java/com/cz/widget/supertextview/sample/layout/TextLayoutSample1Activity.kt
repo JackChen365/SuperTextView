@@ -1,4 +1,4 @@
-package com.cz.widget.supertextview.sample.version1
+package com.cz.widget.supertextview.sample.layout
 
 import android.graphics.BlurMaskFilter
 import android.graphics.Color
@@ -8,10 +8,8 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spannable
 import android.view.LayoutInflater
-import androidx.appcompat.app.AppCompatActivity
 import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
-import com.cz.widget.supertextview.library.style.ReplacementSpan
 import com.cz.widget.supertextview.sample.R
 import com.okay.sampletamplate.ToolBarActivity
 import kotlinx.android.synthetic.main.activity_text_layout_sample1.*
@@ -44,7 +42,7 @@ class TextLayoutSample1Activity : ToolBarActivity() {
         spanList.put("StrikethroughSpan 删除线（中划线）", StrikethroughSpan())
         spanList.put("UnderlineSpan 下划线", UnderlineSpan())
         spanList.put("AbsoluteSizeSpan 绝对大小（文本字体）", AbsoluteSizeSpan(20, true))
-        val drawableSpan = object : DynamicDrawableSpan(ALIGN_BASELINE) {
+        val drawableSpan = object : DynamicDrawableSpan() {
             override fun getDrawable(): Drawable {
                 val d = resources.getDrawable(R.mipmap.ic_launcher)
                 d.setBounds(0, 0, 50, 50)

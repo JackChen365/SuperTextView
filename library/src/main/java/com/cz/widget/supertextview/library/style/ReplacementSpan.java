@@ -47,17 +47,13 @@ public abstract class ReplacementSpan extends MetricAffectingSpan {
      */
     public static final int PARAGRAPH_BREAK_LINE=PARAGRAPH_FLAG | BREAK_LINE_FLAG;
     /**
-     * 当前控件自动换行
+     * 遇到此控件自动换行
      */
     public static final int BREAK_LINE=BREAK_LINE_FLAG;
     /**
      * 标志span按flow摆放,但如果超出尺寸 ,则放到下一行
      */
     public static final int CONSIDER_BREAK_LINE=FLOW_FLAG | CONSIDER_BREAK_LINE_FLAG;
-    /**
-     * 跟随内容,排版后换行
-     */
-    public static final int FLOW_SINGLE_LINE=FLOW_FLAG | BREAK_LINE_FLAG | SINGLE_LINE_FLAG;
     /**
      * 独占一行
      */
@@ -78,6 +74,13 @@ public abstract class ReplacementSpan extends MetricAffectingSpan {
     }
 
     /**
+     * 该元素是否断行
+     */
+    public static boolean isSingleLine(int layoutMode){
+        return 0!=(SINGLE_LINE_FLAG & layoutMode);
+    }
+
+    /**
      * 该元素是否超出断行
      */
     public static boolean considerBreakLine(int layoutMode){
@@ -95,8 +98,7 @@ public abstract class ReplacementSpan extends MetricAffectingSpan {
                          int start, int end,
                          Paint.FontMetricsInt fm);
     public abstract void draw(Canvas canvas, CharSequence text,
-                     int start, int end, float x,
-                     int top, int y, int bottom, Paint paint);
+                     int start, int end, float x,float y, Paint paint);
 
     /**
      * 获得元素排版模式

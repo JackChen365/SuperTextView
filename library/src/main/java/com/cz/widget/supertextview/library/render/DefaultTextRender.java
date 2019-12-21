@@ -11,7 +11,7 @@ import com.cz.widget.supertextview.library.style.ReplacementSpan;
 public class DefaultTextRender extends TextRender {
 
     @Override
-    public void addText(CharSequence text, int start, int end, float x, float y, TextPaint textPaint) {
+    public void addText(CharSequence text, int start, int end, float x, float y, float textWidth, TextPaint textPaint) {
     }
 
     @Override
@@ -19,10 +19,18 @@ public class DefaultTextRender extends TextRender {
     }
 
     @Override
-    public void drawReplacementSpan(Canvas canvas, ReplacementSpan replacementSpan, CharSequence text, int start, int end, float x, int top, int y, int bottom, TextPaint textPaint) {
-        replacementSpan.draw(canvas, text, start, end, x, top, y, bottom, textPaint);
+    public void addReplacementSpan(ReplacementSpan span, CharSequence text, int start, int end, float x, float y, float width, TextPaint textPaint) {
     }
 
+    @Override
+    public void removeSpan(ReplacementSpan span, CharSequence source, int start, int end) {
+
+    }
+
+    @Override
+    public void drawReplacementSpan(Canvas canvas, TextPaint textPaint,TextPaint workPaint,ReplacementSpan replacementSpan, CharSequence text, int start, int end, float x, float y) {
+        replacementSpan.draw(canvas, text, start, end, x, y, textPaint);
+    }
     /**
      *
      * @param canvas
@@ -32,7 +40,7 @@ public class DefaultTextRender extends TextRender {
      * @param textPaint
      */
     @Override
-    public void drawText(Canvas canvas, CharSequence text, int start, int end,float x,float y,TextPaint textPaint) {
+    public void drawText(Canvas canvas,TextPaint textPaint,TextPaint workPaint, CharSequence text, int start, int end,float x,float y) {
         canvas.drawText(text,start,end,x,y,textPaint);
     }
 }

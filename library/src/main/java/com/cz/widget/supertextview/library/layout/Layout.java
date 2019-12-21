@@ -26,6 +26,7 @@ public abstract class Layout {
     TextPaint paint;
     TextRender textRender;
     TextPaint workPaint;
+    Paint.FontMetricsInt fontMetricsInt;
     int width;
     private float spacingAdd;
     private Spanned spanned;
@@ -45,6 +46,7 @@ public abstract class Layout {
         this.text = text;
         this.paint = paint;
         this.workPaint = new TextPaint();
+        this.fontMetricsInt = new Paint.FontMetricsInt();
         this.textRender=textRender;
         this.width = width;
         this.spacingAdd = spacingAdd;
@@ -367,7 +369,7 @@ public abstract class Layout {
                 c.drawText(buf, start, end, x, baseline, paint);
             } else {
                 int lineGravity = getLineGravity(i);
-                Styled.drawText(c,textRender, buf, start, end, x, lineTop, baseline, lineBottom, paint, workPaint, lineGravity,false);
+                Styled.drawText(c,textRender, buf, start, end, x, lineTop, baseline, lineBottom,fontMetricsInt,paint, workPaint,lineGravity,false);
             }
         }
         //绘制其他元素

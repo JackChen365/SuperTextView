@@ -2,12 +2,12 @@ package com.cz.widget.supertextview.sample
 
 import android.app.Application
 import com.cz.widget.supertextview.sample.animation.AnimationText1Activity
-import com.cz.widget.supertextview.sample.animation.AnimationText2Activity
 import com.cz.widget.supertextview.sample.extension.SelectTextActivity
 import com.cz.widget.supertextview.sample.extension.SelectTextWordActivity
-import com.cz.widget.supertextview.sample.version1.TextLayoutSample1Activity
-import com.cz.widget.supertextview.sample.version1.TextLayoutSample2Activity
-import com.cz.widget.supertextview.sample.version1.TextLayoutSample3Activity
+import com.cz.widget.supertextview.sample.layout.TextLayoutSample1Activity
+import com.cz.widget.supertextview.sample.layout.TextLayoutSample2Activity
+import com.cz.widget.supertextview.sample.layout.TextLayoutSample3Activity
+import com.cz.widget.supertextview.sample.layout.TextLayoutSample4Activity
 import com.okay.sampletamplate.configurtion.TemplateConfiguration
 
 
@@ -37,19 +37,10 @@ class SampleApplication: Application() {
                 desc = "演示TextLayout动态优化运处及渲染"
                 clazz= TextLayoutSample3Activity::class.java
             }
-            category {
-                title="动画扩展"
-                desc = "演示一些动画扩展功能"
-                item{
-                    title="基本行动画"
-                    desc = "演示为每一行文本添加动画"
-                    clazz= AnimationText1Activity::class.java
-                }
-                item{
-                    title="文本动画扩展"
-                    desc = "演示为每一个文本添加动画"
-                    clazz= AnimationText2Activity::class.java
-                }
+            item{
+                title="基本行动画"
+                desc = "演示为每一行文本添加动画"
+                clazz= AnimationText1Activity::class.java
             }
             category {
                 title="功能扩展"
@@ -64,6 +55,11 @@ class SampleApplication: Application() {
                     desc = "演示选中滑动文本"
                     clazz=SelectTextActivity::class.java
                 }
+            }
+            item{
+                title="排版属性测试"
+                desc = "演示不同控件或者Span的排版属性"
+                clazz=TextLayoutSample4Activity::class.java
             }
         }
     }

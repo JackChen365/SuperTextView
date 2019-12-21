@@ -41,7 +41,8 @@ public class HighlightLineDecoration extends LineDecoration {
 
     @Override
     public void getParagraphLineOffsets(TextParagraph textParagraph, int line, Rect outRect) {
-        outRect.set(lineParagraphPadding,lineParagraphPadding,lineParagraphPadding,lineParagraphPadding);
+        outRect.set(0,0,0,0);
+//        outRect.set(lineParagraphPadding,lineParagraphPadding,lineParagraphPadding,lineParagraphPadding);
     }
 
     @Override

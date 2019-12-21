@@ -1,4 +1,4 @@
-package com.cz.widget.supertextview.sample.version1
+package com.cz.widget.supertextview.sample.layout
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
+import com.cz.widget.supertextview.library.style.ReplacementSpan
 import com.cz.widget.supertextview.sample.R
 import com.cz.widget.supertextview.sample.linedecoration.HighlightLineDecoration
 import com.okay.sampletamplate.ToolBarActivity
@@ -65,7 +66,11 @@ class TextLayoutSample2Activity : ToolBarActivity() {
                 val textSpan = getTextSpan(i)
                 if(null!=textSpan){
                     positionList.add(index)
-                    spannableString.setSpan(textSpan, index, Math.min(text.length,index+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    if(textSpan is ReplacementSpan){
+                        spannableString.setSpan(textSpan,index, Math.min(text.length,index+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    } else {
+                        spannableString.setSpan(textSpan, index, Math.min(text.length,index+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
                 }
             }
             start=index
@@ -93,18 +98,24 @@ class TextLayoutSample2Activity : ToolBarActivity() {
 //            spannableString.setSpan(textSpan, lineStart, lineStart+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 //        }
 
-//        Carre de l'Est Swiss Sap Sago Oschtjepka Capriole Banon Brie de Meaux Sainte Maure Acorn Pelardon des Corbieres Grand Vatel Abbaye de Belloc Frinault Venaco Pave de Chirac Olde York Kashta Petit-Suisse Cornish Pepper Truffe Allgauer Emmentaler Vendomois
-//        [5, 8, 14, 20, 24, 29, 40, 49, 55, 60, 63, 69, 76, 82, 88, 97, 101, 111, 117, 123, 130, 133, 140, 149, 156, 161, 164, 171, 176, 181, 188, 201, 209, 216, 223, 232, 243]
-//        [12, 1, 6, 2, 9, 6, 4, 12, 6, 6, 3, 0, 5, 5, 4, 9, 0, 9, 4, 0, 1, 0, 5, 8, 6, 6, 7, 5, 2, 10, 5, 0, 8, 10, 11, 3, 7]
+//        Coeur de Chevre Raclette Vieux Corse Limburger Canestrato Pave de Chirac Reblochon Barry's Bay Cheddar Vieux Corse Ragusano Mascarpone (Australian) Maroilles Chabis de Gatine Rustinu Ricotta Salata Saint-Nectaire Barry's Bay Cheddar Selles sur Cher Waterloo Leyden Asiago Piora Meredith Blue Pasteurized Processed Durrus Serra da Estrela Le Fium Orbo Dunsyre Blue Buxton Blue
+//        [5, 8, 15, 24, 30, 36, 46, 57, 62, 65, 72, 82, 90, 94, 102, 108, 114, 123, 134, 147, 157, 164, 167, 174, 182, 190, 197, 212, 220, 224, 232, 239, 243, 248, 257, 264, 271, 277, 286, 291, 303, 313, 320, 326, 329, 337, 340, 345, 350, 358, 363, 370]
+//        [2, 9, 8, 2, 11, 10, 5, 0, 2, 4, 7, 2, 0, 0, 3, 7, 11, 8, 0, 4, 11, 2, 4, 8, 1, 7, 4, 8, 6, 0, 8, 3, 10, 1, 1, 11, 3, 7, 4, 11, 5, 10, 0, 3, 1, 9, 6, 0, 9, 5, 3, 1]
 
-//        val text="Carre de l'Est Swiss Sap Sago Oschtjepka Capriole Banon Brie de Meaux Sainte Maure Acorn Pelardon des Corbieres Grand Vatel Abbaye de Belloc Frinault Venaco Pave de Chirac Olde York Kashta Petit-Suisse Cornish Pepper Truffe Allgauer Emmentaler Vendomois"
+
+
+//        val text="Coeur de Chevre Raclette Vieux Corse Limburger Canestrato Pave de Chirac Reblochon Barry's Bay Cheddar Vieux Corse Ragusano Mascarpone (Australian) Maroilles Chabis de Gatine Rustinu Ricotta Salata Saint-Nectaire Barry's Bay Cheddar Selles sur Cher Waterloo Leyden Asiago Piora Meredith Blue Pasteurized Processed Durrus Serra da Estrela Le Fium Orbo Dunsyre Blue Buxton Blue"
 //        val spannableString=SpannableString(text)
 //        //初始化span
-//        val positionList= mutableListOf(5, 8, 14, 20, 24, 29, 40, 49, 55, 60, 63, 69, 76, 82, 88, 97, 101, 111, 117, 123, 130, 133, 140, 149, 156, 161, 164, 171, 176, 181, 188, 201, 209, 216, 223, 232, 243)
-//        val spanPositionList= mutableListOf(12, 1, 6, 2, 9, 6, 4, 12, 6, 6, 3, 0, 5, 5, 4, 9, 0, 9, 4, 0, 1, 0, 5, 8, 6, 6, 7, 5, 2, 10, 5, 0, 8, 10, 11, 3, 7)
+//        val positionList= mutableListOf(5, 8, 15, 24, 30, 36, 46, 57, 62, 65, 72, 82, 90, 94, 102, 108, 114, 123, 134, 147, 157, 164, 167, 174, 182, 190, 197, 212, 220, 224, 232, 239, 243, 248, 257, 264, 271, 277, 286, 291, 303, 313, 320, 326, 329, 337, 340, 345, 350, 358, 363, 370)
+//        val spanPositionList= mutableListOf(2, 9, 8, 2, 11, 10, 5, 0, 2, 4, 7, 2, 0, 0, 3, 7, 11, 8, 0, 4, 11, 2, 4, 8, 1, 7, 4, 8, 6, 0, 8, 3, 10, 1, 1, 11, 3, 7, 4, 11, 5, 10, 0, 3, 1, 9, 6, 0, 9, 5, 3, 1)
 //        positionList.forEachIndexed { index, position->
 //            var textSpan = getTextSpan(spanPositionList[index])
-//            spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            if(textSpan is ReplacementSpan){
+//                spannableString.setSpan(textSpan,position, Math.min(text.length,position+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            } else {
+//                spannableString.setSpan(textSpan, position, Math.min(text.length,position+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            }
 //        }
 //        //更新布局
 //        textLayout.clear()

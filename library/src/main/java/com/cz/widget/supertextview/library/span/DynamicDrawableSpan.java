@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.view.Gravity;
 
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
 
@@ -30,39 +31,14 @@ import java.lang.ref.WeakReference;
  */
 public abstract class DynamicDrawableSpan extends ReplacementSpan {
     private static final String TAG = "DynamicDrawableSpan";
-    
-    /**
-     * A constant indicating that the lineBottom of this span should be aligned
-     * with the lineBottom of the surrounding text, i.e., at the same level as the
-     * lowest descender in the text.
-     */
-    public static final int ALIGN_BOTTOM = 0;
-    
-    /**
-     * A constant indicating that the lineBottom of this span should be aligned
-     * with the baseline of the surrounding text.
-     */
-    public static final int ALIGN_BASELINE = 1;
-    
-    protected final int mVerticalAlignment;
-    
-    public DynamicDrawableSpan() {
-        mVerticalAlignment = ALIGN_BOTTOM;
+    private final int gravity;
+
+    public DynamicDrawableSpan(){
+        this.gravity=Gravity.TOP;
     }
 
-    /**
-     * @param verticalAlignment one of {@link #ALIGN_BOTTOM} or {@link #ALIGN_BASELINE}.
-     */
-    protected DynamicDrawableSpan(int verticalAlignment) {
-        mVerticalAlignment = verticalAlignment;
-    }
-
-    /**
-     * Returns the vertical alignment of this span, one of {@link #ALIGN_BOTTOM} or
-     * {@link #ALIGN_BASELINE}.
-     */
-    public int getVerticalAlignment() {
-        return mVerticalAlignment;
+    public DynamicDrawableSpan(int gravity) {
+        this.gravity=gravity;
     }
 
     /**
@@ -92,17 +68,10 @@ public abstract class DynamicDrawableSpan extends ReplacementSpan {
 
     @Override
     public void draw(Canvas canvas, CharSequence text,
-                     int start, int end, float x, 
-                     int top, int y, int bottom, Paint paint) {
+                     int start, int end, float x, float y, Paint paint) {
         Drawable b = getCachedDrawable();
         canvas.save();
-        
-        int transY = bottom - b.getBounds().bottom;
-        if (mVerticalAlignment == ALIGN_BASELINE) {
-            transY -= paint.getFontMetricsInt().descent;
-        }
-
-        canvas.translate(x, transY);
+        canvas.translate(x, y);
         b.draw(canvas);
         canvas.restore();
     }
@@ -116,7 +85,7 @@ public abstract class DynamicDrawableSpan extends ReplacementSpan {
 
         if (d == null) {
             d = getDrawable();
-            mDrawableRef = new WeakReference<Drawable>(d);
+            mDrawableRef = new WeakReference<>(d);
         }
 
         return d;

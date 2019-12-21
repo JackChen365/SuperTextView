@@ -23,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Gravity;
 
 import java.io.InputStream;
 
@@ -34,92 +35,48 @@ public class ImageSpan extends DynamicDrawableSpan {
     private String mSource;
 
     /**
-     * @deprecated Use {@link #ImageSpan(Context, Bitmap)} instead.
+     * @deprecated Use {@link #ImageSpan(android.graphics.drawable.Drawable, int)} instead.
      */
     @Deprecated
-    public ImageSpan(Bitmap b) {
-        this(null, b, ALIGN_BOTTOM);
+    public ImageSpan(Bitmap b, int gravity) {
+        this(null, b,gravity);
     }
 
-    /**
-     * @deprecated Use {@link #ImageSpan(Context, Bitmap, int) instead.
-     */
-    @Deprecated
-    public ImageSpan(Bitmap b, int verticalAlignment) {
-        this(null, b, verticalAlignment);
-    }
-
-    public ImageSpan(Context context, Bitmap b) {
-        this(context, b, ALIGN_BOTTOM);
-    }
-
-    /**
-     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
-     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
-     */
-    public ImageSpan(Context context, Bitmap b, int verticalAlignment) {
-        super(verticalAlignment);
+    public ImageSpan(Context context, Bitmap b, int gravity) {
+        super(gravity);
         mContext = context;
         mDrawable = context != null
                 ? new BitmapDrawable(context.getResources(), b)
                 : new BitmapDrawable(b);
         int width = mDrawable.getIntrinsicWidth();
         int height = mDrawable.getIntrinsicHeight();
-        mDrawable.setBounds(0, 0, width > 0 ? width : 0, height > 0 ? height : 0); 
+        mDrawable.setBounds(0, 0, width > 0 ? width : 0, height > 0 ? height : 0);
     }
 
-    public ImageSpan(Drawable d) {
-        this(d, ALIGN_BOTTOM);
+    public ImageSpan(Drawable d){
+        this(d, Gravity.TOP);
     }
 
-    /**
-     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
-     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
-     */
-    public ImageSpan(Drawable d, int verticalAlignment) {
-        super(verticalAlignment);
+    public ImageSpan(Drawable d, int gravity) {
+        super(gravity);
         mDrawable = d;
     }
 
-    public ImageSpan(Drawable d, String source) {
-        this(d, source, ALIGN_BOTTOM);
-    }
-
-    /**
-     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
-     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
-     */
-    public ImageSpan(Drawable d, String source, int verticalAlignment) {
-        super(verticalAlignment);
+    public ImageSpan(Drawable d, String source, int gravity) {
+        super(gravity);
         mDrawable = d;
         mSource = source;
     }
 
-    public ImageSpan(Context context, Uri uri) {
-        this(context, uri, ALIGN_BOTTOM);
-    }
-
-    /**
-     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
-     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
-     */
-    public ImageSpan(Context context, Uri uri, int verticalAlignment) {
-        super(verticalAlignment);
+    public ImageSpan(Context context, Uri uri, int gravity) {
+        super(gravity);
         mContext = context;
         mContentUri = uri;
         mSource = uri.toString();
     }
 
-    public ImageSpan(Context context, int resourceId) {
-        this(context, resourceId, ALIGN_BOTTOM);
-    }
-
-    /**
-     * @param verticalAlignment one of {@link DynamicDrawableSpan#ALIGN_BOTTOM} or
-     * {@link DynamicDrawableSpan#ALIGN_BASELINE}.
-     */
-    public ImageSpan(Context context, int resourceId, int verticalAlignment) {
-        super(verticalAlignment);
+    public ImageSpan(Context context, int resourceId, int gravity) {
+        super(gravity);
         mContext = context;
         mResourceId = resourceId;
     }
