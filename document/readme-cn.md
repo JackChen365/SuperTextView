@@ -97,8 +97,8 @@ public class HighlightLineDecoration extends LineDecoration {
 注意,如果复写了文本渲染器,就代表接管了所有元素渲染,这时候如果不在drawText/drawReplacementSpan内手动将元素绘制.
 界面将没有任何绘制元素
 
-See [DefaultTextRender](library/src/main/java/com/cz/widget/supertextview/library/render/DefaultTextRender)
-See [SimpleTextAnimation](library/src/main/java/com/cz/widget/supertextview/library/animation/SimpleTextAnimation)
+See [DefaultTextRender](library/src/main/java/com/cz/widget/supertextview/library/render/DefaultTextRender)<br>
+See [SimpleTextAnimation](library/src/main/java/com/cz/widget/supertextview/library/animation/SimpleTextAnimation)<br>
 
 
 ### Problems
