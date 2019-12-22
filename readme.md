@@ -37,9 +37,9 @@ It seems impossible for me. Then I stopped that project and start this project. 
     android:layout_marginBottom="64dp"/>
 ```
 
-3. Add text style just like use the Android TextView. But for a view we can't let you add view like the ViewGroup
-It's a little different between ViewGroup, cause I don't know I you can add view by yourself How I manager all the elements in my Text layout.
-That's a serious problems. So I was decider prohibited you add view by yourselves.
+3. Add text style just like use the Android TextView. But as a view group include the text we can't let you add view like the ViewGroup
+It's a little different between ViewGroup and TextView Because I don't know how to manage all the elements in my Text layout.
+That's a serious problem. So I was decider prohibited you add view by yourselves.
 
 ```
 // Here you add style span like when you use textView
@@ -100,11 +100,11 @@ public class HighlightLineDecoration extends LineDecoration {
 }
 ``` 
 
-5. The TextRender. You know The textView wants to save more memory so all the information was in Layout. If you want to change how to render text information. You have to implement your own text layout. That's way too much work to do, I gave it up. That's why In this project I want to have a function that I could easily change the rules. 
+5. The TextRender. You know The textView wants to save more memories so all the information was in Layout. But if you want to change how the way how to render text information. You have to implement your own text layout. That's way too much work to do, I gave it up. That's why In this project I want to have a function that I could easily change the rules. 
 The TextRender is works for that.
 
-See [DefaultTextRender](library/src/main/java/com/cz/widget/supertextview/library/render/DefaultTextRender)<br>
-See [SimpleTextAnimation](library/src/main/java/com/cz/widget/supertextview/library/animation/SimpleTextAnimation)<br>
+See [DefaultTextRender](https://github.com/momodae/SuperTextView/blob/master/library/src/main/java/com/cz/widget/supertextview/library/render/DefaultTextRender.java)<br>
+See [SimpleTextAnimation](https://github.com/momodae/SuperTextView/blob/master/library/src/main/java/com/cz/widget/supertextview/library/animation/SimpleTextAnimation.java)<br>
 
 *Warning:*
 If you want to have your own TextRender. Make sure when the view call the method:drawText/drawReplacementSpan you or you will lost all the information 
