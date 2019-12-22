@@ -2,12 +2,14 @@ package com.cz.widget.supertextview.library.span;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
 import com.cz.widget.supertextview.library.view.FlowLayoutParams;
+import com.cz.widget.supertextview.library.view.TextParent;
 
 /**
  * 包装View的span对象
@@ -16,7 +18,7 @@ public class ViewSpan extends ReplacementSpan {
     /**
      * 记录添加的父容器
      */
-    private ViewGroup parentView;
+    private TextParent parentView;
     /**
      * 当前操作子控件
      */
@@ -76,11 +78,9 @@ public class ViewSpan extends ReplacementSpan {
      * 将子控件添加到父控件
      */
     public void attachToView(){
-        if(null==view.getParent()){
-            //待添加容器
-            parentView.addView(view);
-        }
-        View parentView = (View)view.getParent();
+        //待添加容器
+        parentView.attachViewToParent(view,-1,view.getLayoutParams());
+        //排版控件
         int paddingLeft = parentView.getPaddingLeft();
         int paddingTop = parentView.getPaddingTop();
         int offsetTop=paddingTop+layoutTop;
@@ -98,18 +98,13 @@ public class ViewSpan extends ReplacementSpan {
     }
 
     /**
-     * 将子控件添加到父控件
+     * 将子控件从父容器临时移除
      */
     public void detachFromParent(){
-        ViewParent parent = view.getParent();
-        if(null!=parent){
-            ViewGroup parentView=(ViewGroup)parent;
-            parentView.removeView(view);
-            this.parentView=parentView;
-        }
+        parentView.detachViewFromParent(view);
     }
 
-    public void setParentView(ViewGroup parentView) {
+    public void setParentView(TextParent parentView) {
         this.parentView = parentView;
     }
 

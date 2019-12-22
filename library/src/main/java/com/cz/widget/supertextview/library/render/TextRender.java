@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
+import com.cz.widget.supertextview.library.view.TextParent;
 
 /**
  * 文本渲染器
@@ -17,16 +18,16 @@ public abstract class TextRender {
     /**
      * 当前关联对象
      */
-    private ViewGroup target;
+    private TextParent target;
     /**
      * 设置关联target对象
      * @param target
      */
-    public void setTarget(ViewGroup target) {
+    public void setTarget(TextParent target) {
         this.target = target;
     }
 
-    public ViewGroup getTarget() {
+    public TextParent getTarget() {
         return target;
     }
 

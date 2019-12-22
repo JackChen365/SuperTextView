@@ -21,6 +21,7 @@ import com.cz.widget.supertextview.library.text.TextLine;
 import com.cz.widget.supertextview.library.text.TextParagraph;
 import com.cz.widget.supertextview.library.utils.ArrayUtils;
 import com.cz.widget.supertextview.library.utils.TextUtilsCompat;
+import com.cz.widget.supertextview.library.view.TextParent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class StaticLayout extends Layout {
     void fillText(CharSequence source, int bufferStart, int bufferEnd,
         TextPaint paint, int outerWidth, float spacingAdd, int align){
         List<TextLine> textLineList=new ArrayList<>();
-        ViewGroup parentView = textRender.getTarget();
+        TextParent parentView = textRender.getTarget();
         int end = TextUtils.indexOf(source, '\n', bufferStart, bufferEnd);
         int bufferSize = end >= 0 ? end - bufferStart : bufferEnd - bufferStart;
         if (charArrays == null) {
@@ -596,6 +597,16 @@ public class StaticLayout extends Layout {
     @Override
     public int getDecoratedScrollLineBottom(int line) {
         return textLines[line].getDecoratedLineBottom();
+    }
+
+    @Override
+    public int getScrollLineTop(int line) {
+        return textLines[line].getScrollTop();
+    }
+
+    @Override
+    public int getScrollLineBottom(int line) {
+        return textLines[line].getScrollBottom();
     }
 
     public int getDecoratedDescent(int line) {

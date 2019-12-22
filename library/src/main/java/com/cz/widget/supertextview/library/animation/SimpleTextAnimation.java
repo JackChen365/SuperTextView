@@ -13,6 +13,7 @@ import com.cz.widget.supertextview.library.animation.item.TextLineAnimation;
 import com.cz.widget.supertextview.library.animation.item.TextSpanAnimation;
 import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
+import com.cz.widget.supertextview.library.view.TextParent;
 
 /**
  * 动画的文本渲染器，用于扩展文本动画
@@ -35,7 +36,7 @@ public class SimpleTextAnimation extends TextRender {
         PropertyValuesHolder xValueHolder = PropertyValuesHolder.ofFloat("x",-textWidth,x);
         BaseTextAnimation textAnimation = TextSpanAnimation.ofPropertyValuesHolder(TextLineAnimation.class,alphaValueHolder,xValueHolder);
         animationItemArray.put(start,textAnimation);
-        View target = getTarget();
+        TextParent target = getTarget();
         textAnimation.setTarget(target);
 //        textAnimation.setDuration(600);
         textAnimation.setText(text,start,end);
@@ -61,7 +62,7 @@ public class SimpleTextAnimation extends TextRender {
         TextSpanAnimation textAnimation = TextSpanAnimation.ofPropertyValuesHolder(TextSpanAnimation.class,alphaValueHolder,translationXValueHolder);
         animationItemArray.put(start,textAnimation);
         textAnimation.setReplacementSpan(span);
-        View target = getTarget();
+        TextParent target = getTarget();
         textAnimation.setTarget(target);
 //        textAnimation.setDuration(600);
         textAnimation.setText(text,start,end);
@@ -97,33 +98,33 @@ public class SimpleTextAnimation extends TextRender {
         }
     }
 
-    public int getLeftPadding(){
-        View target = getTarget();
+    public int getPaddingLeft(){
+        TextParent target = getTarget();
         return target.getPaddingLeft();
     }
 
     public int getTopPadding(){
-        View target = getTarget();
+        TextParent target = getTarget();
         return target.getPaddingTop();
     }
 
-    public int getRightPadding(){
-        View target = getTarget();
+    public int getPaddingRight(){
+        TextParent target = getTarget();
         return target.getPaddingRight();
     }
 
-    public int getBottomPadding(){
-        View target = getTarget();
+    public int getPaddingBottom(){
+        TextParent target = getTarget();
         return target.getPaddingBottom();
     }
 
     public int getWidth(){
-        View target = getTarget();
+        TextParent target = getTarget();
         return target.getWidth();
     }
 
     public int getHeight(){
-        View target = getTarget();
+        TextParent target = getTarget();
         return target.getHeight();
     }
 
@@ -132,13 +133,13 @@ public class SimpleTextAnimation extends TextRender {
      * @return Rect 此区域为绘制文本的总区域
      */
     protected Rect getLayoutBounds(){
-        View target = getTarget();
-        int totalPaddingLeft = target.getPaddingLeft();
-        int totalPaddingTop = target.getPaddingTop();
-        int totalPaddingRight = target.getPaddingRight();
-        int totalPaddingBottom = target.getPaddingBottom();
-        int width = target.getWidth();
-        int height = target.getHeight();
+        TextParent textParent = getTarget();
+        int width = textParent.getWidth();
+        int height = textParent.getHeight();
+        int totalPaddingLeft = textParent.getPaddingLeft();
+        int totalPaddingTop = textParent.getPaddingTop();
+        int totalPaddingRight = textParent.getPaddingRight();
+        int totalPaddingBottom = textParent.getPaddingBottom();
         bounds.set(totalPaddingLeft,totalPaddingTop,width-totalPaddingRight,height-totalPaddingBottom);
         return bounds;
     }

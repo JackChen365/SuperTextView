@@ -41,7 +41,7 @@ import com.cz.widget.supertextview.library.render.TextRender;
  *
 
  */
-public class RecyclerTextLayout extends ViewGroup{
+public class RecyclerTextLayout extends ViewGroup implements TextParent{
     private static final String TAG="RecyclerTextLayout";
     /**
      * 绘制文本画笔对象
@@ -157,8 +157,9 @@ public class RecyclerTextLayout extends ViewGroup{
                 layout = new RecyclerStaticLayout(text, textPaint, lineDecoration,textRender, outerWidth,outerHeight, 0f, Gravity.CENTER);
                 layout.setMeasureSpecs(widthMeasureSpec,heightMeasureSpec);
             } else if(outerHeight!=layout.getLayoutHeight()){
-                //todo 外部高度变化,重新加载
-//                layout.setLayoutHeight(outerHeight);
+                //外部高度变化,重新加载
+                detachAllViewsFromParent();
+                layout.setLayoutHeight(outerHeight);
             }
         }
 //        //重新设置尺寸
@@ -427,10 +428,18 @@ public class RecyclerTextLayout extends ViewGroup{
     //---------------------------------------------------------------------------------------
 
     @Override
-    public void scrollBy(int x, int y) {
-        super.scrollBy(x, y);
-        //纵向滚动,并检测是否需要铺满
-//        scrollVerticallyBy(y,recyclerBin);
+    public void attachViewToParent(View child, int index, LayoutParams params) {
+        super.attachViewToParent(child,index,params);
+    }
+
+    @Override
+    public void detachAllViewsFromParent() {
+        super.detachAllViewsFromParent();
+    }
+
+    @Override
+    public void detachViewFromParent(View child) {
+        super.detachViewFromParent(child);
     }
 
     class ViewFlipper implements Runnable{

@@ -105,36 +105,6 @@ See [SimpleTextAnimation](library/src/main/java/com/cz/widget/supertextview/libr
 本项目为一个业余项目,时间有限. 花费了好几个周末,对TextView对了大量的研究,但仍然有很多问题.希望理解.
 
 当前我知道的问题:
-*  控件尺寸高发生变化,因为会导致高度设置问题
-
-```
-//Both TextLayout/RecyclerTextLayout have this problems
-@Override
-protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    //测量子孩子尺寸
-    measureChildren(widthMeasureSpec,heightMeasureSpec);
-    int measuredWidth = getMeasuredWidth();
-    int measuredHeight = getMeasuredHeight();
-    final int outerWidth=measuredWidth - getPaddingLeft() - getPaddingRight();
-    int outerHeight=measuredHeight-getPaddingTop()-getPaddingBottom();
-    //Initcial
-    if(null!=text){
-        //Initialize text layout
-        if(null==layout||text!=layout.getText()){
-            layout = new StaticLayout(text, textPaint, lineDecoration,textRender, outerWidth, 0f, gravity);
-        } else if(outerHeight!=layout.getLayoutHeight()){
-            //todo When view height changed, We should reset layout height. But there have an issue
-            layout.setLayoutHeight(outerHeight);
-        }
-    }
-//        //重新设置尺寸
-    if(null!=layout&&measuredHeight!=(layout.getHeight()+getPaddingTop()+getPaddingBottom())){
-        final int layoutHeight=layout.getHeight();
-        setMeasuredDimension(measuredWidth,getPaddingTop()+layoutHeight+getPaddingBottom());
-    }
-}
-```
 
 * 段落结果运算完之后,在复用池内,一直缓存着,回收逻辑没有完善
 

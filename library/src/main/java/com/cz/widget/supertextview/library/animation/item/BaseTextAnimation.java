@@ -14,6 +14,8 @@ import android.view.View;
 
 import androidx.annotation.FloatRange;
 
+import com.cz.widget.supertextview.library.view.TextParent;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class BaseTextAnimation {
     /**
      * 关联控件对象
      */
-    private View target;
+    private TextParent target;
     /**
      * 当前文本
      */
@@ -176,7 +178,7 @@ public class BaseTextAnimation {
         }
     }
 
-    public void setTarget(View target) {
+    public void setTarget(TextParent target) {
         this.target = target;
     }
 

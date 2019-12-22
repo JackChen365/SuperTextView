@@ -36,7 +36,7 @@ import com.cz.widget.supertextview.library.spannable.SpannableString;
  * 2. 优化渲染
  * 3. 优化动态修改
  */
-public class TextLayout extends ViewGroup{
+public class TextLayout extends ViewGroup implements TextParent{
     private static final String TAG="TextLayout";
     /**
      * 绘制文本画笔对象
@@ -136,8 +136,8 @@ public class TextLayout extends ViewGroup{
             if(null==layout||text!=layout.getText()){
                 layout = new StaticLayout(text, textPaint, lineDecoration,textRender, outerWidth, 0f, gravity);
             } else if(outerHeight!=layout.getLayoutHeight()){
-                //todo 外部高度变化,重新加载
-                //layout.setLayoutHeight(outerHeight);
+                //外部高度变化,重新加载
+                layout.setLayoutHeight(outerHeight);
             }
         }
 //        //重新设置尺寸
@@ -238,4 +238,18 @@ public class TextLayout extends ViewGroup{
         return new FlowLayoutParams(new MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
+    @Override
+    public void attachViewToParent(View child, int index, LayoutParams params) {
+        super.attachViewToParent(child,index,params);
+    }
+
+    @Override
+    public void detachAllViewsFromParent() {
+        super.detachAllViewsFromParent();
+    }
+
+    @Override
+    public void detachViewFromParent(View child) {
+        super.detachViewFromParent(child);
+    }
 }

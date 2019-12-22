@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.render.TextRender;
+import com.cz.widget.supertextview.library.view.TextParent;
 
 /**
  * 文本段落信息,可理解为多行信息汇总
@@ -74,7 +75,7 @@ public class TextParagraph extends TextLine{
     /**
      * 排版子控件
      */
-    public void layoutViewSpan(ViewGroup parentView,CharSequence source,int left,int top) {
+    public void layoutViewSpan(TextParent parentView, CharSequence source, int left, int top) {
         int lineTop = getLineTop();
         for(int i=0;i<lineCount;i++){
             TextLine textLine = textLines[i];

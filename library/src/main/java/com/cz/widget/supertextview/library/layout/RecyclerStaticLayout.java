@@ -6,6 +6,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.cz.widget.supertextview.library.text.TextLine;
 import com.cz.widget.supertextview.library.text.TextParagraph;
 import com.cz.widget.supertextview.library.utils.ArrayUtils;
 import com.cz.widget.supertextview.library.utils.TextUtilsCompat;
+import com.cz.widget.supertextview.library.view.TextParent;
 
 import java.util.Arrays;
 
@@ -581,7 +583,10 @@ public class RecyclerStaticLayout extends Layout {
         //清除当前信息,但保存数组
         lineCount=0;
         Arrays.fill(textLines,0, textLines.length,null);
-        //填空文本信息
+        //清空当前视图所有控件
+        TextParent textParent = textRender.getTarget();
+        textParent.detachAllViewsFromParent();
+        //重新填空文本信息
         updateLayoutStateFromEnd(outerHeight);
         fillText(outerHeight);
     }
@@ -855,7 +860,7 @@ public class RecyclerStaticLayout extends Layout {
      */
     protected void onNewTextLineFilled(TextLine textLine){
         //排版子控件
-        ViewGroup target = textRender.getTarget();
+        TextParent target = textRender.getTarget();
         textLine.layoutViewSpan(target,source,0,0);
         //回调文本渲染
         if(textLine instanceof TextParagraph){
@@ -1003,8 +1008,16 @@ public class RecyclerStaticLayout extends Layout {
             Spanned spanned = (Spanned) this.source;
             ViewSpan[] viewSpans = spanned.getSpans(lineLatterStart, lineLatterEnd, ViewSpan.class);
             for(int i=0;i<viewSpans.length;i++){
-                //从父容器移除
                 ViewSpan viewSpan = viewSpans[i];
+                View view = viewSpan.getView();
+                //如果内容还在屏幕,往上偏移,当快速滚动时,确保所有控件从界面移除
+                //如:top:-293 height:321 界面会剩余:28点内容.如果直接调用:detachFromParent,视图仍会有部分在界面
+                int top = view.getTop();
+                int height = view.getHeight();
+                if(0 < height+top){
+                    view.offsetTopAndBottom(-top-height);
+                }
+                //从父容器移除
                 viewSpan.detachFromParent();
             }
         }
@@ -1171,6 +1184,16 @@ public class RecyclerStaticLayout extends Layout {
     @Override
     public int getDecoratedScrollLineBottom(int line) {
         return textLines[line].getDecoratedScrollLineBottom();
+    }
+
+    @Override
+    public int getScrollLineTop(int line) {
+        return textLines[line].getScrollTop();
+    }
+
+    @Override
+    public int getScrollLineBottom(int line) {
+        return textLines[line].getScrollBottom();
     }
 
     private int getLineTop(int line) {

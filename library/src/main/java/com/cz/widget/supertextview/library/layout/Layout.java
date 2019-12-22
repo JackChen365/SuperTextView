@@ -136,18 +136,33 @@ public abstract class Layout {
     }
 
     /**
-     * 返回指定行起始高
+     * 返回指定行起始高,此处包含行间距运算
      * @param line
      * @return
      */
     public abstract int getDecoratedScrollLineTop(int line);
 
     /**
-     * 获得行结束高度,此处暂不存在行间距运算
+     * 获得行结束高度,此处包含行间距运算
      * @param line
      * @return
      */
     public abstract int getDecoratedScrollLineBottom(int line);
+
+    /**
+     * 返回指定行起始高,此处暂不存在行间距运算
+     * @param line
+     * @return
+     */
+    public abstract int getScrollLineTop(int line);
+
+    /**
+     * 获得行结束高度,此处暂不存在行间距运算
+     * @param line
+     * @return
+     */
+    public abstract int getScrollLineBottom(int line);
+
 
     /**
      * 返回指定行文本Descent位置

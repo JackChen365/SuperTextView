@@ -128,43 +128,10 @@ Sorry I do know a lot of problems in this project. I just do all of this by myse
 Thanks for your understanding.
 
 The problems that I knew was:
-*  When view height changed, We should reset layout height. But there have an issue
-
-```
-//Both TextLayout/RecyclerTextLayout have this problems
-@Override
-protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    //here measure all the children. It's only for static layout
-    measureChildren(widthMeasureSpec,heightMeasureSpec);
-    int measuredWidth = getMeasuredWidth();
-    int measuredHeight = getMeasuredHeight();
-    final int outerWidth=measuredWidth - getPaddingLeft() - getPaddingRight();
-    int outerHeight=measuredHeight-getPaddingTop()-getPaddingBottom();
-    //Initcial
-    if(null!=text){
-        //Initialize text layout
-        if(null==layout||text!=layout.getText()){
-            layout = new StaticLayout(text, textPaint, lineDecoration,textRender, outerWidth, 0f, gravity);
-        } else if(outerHeight!=layout.getLayoutHeight()){
-            //todo When view height changed, We should reset layout height. But there have an issue
-            layout.setLayoutHeight(outerHeight);
-        }
-    }
-//        //reset view dimension if size changed
-    if(null!=layout&&measuredHeight!=(layout.getHeight()+getPaddingTop()+getPaddingBottom())){
-        final int layoutHeight=layout.getHeight();
-        setMeasuredDimension(measuredWidth,getPaddingTop()+layoutHeight+getPaddingBottom());
-    }
-}
-```
 
 * RecyclerTextLayout When I calculate one paragraph I cached the paragraph object to a RecyclerPool. I didn't finish this function
 That I have to give the chance release the cache.
 
-```
-
-```
 
 * The View click event and touch event conflicts. Now I knew that when you set an click listener for child view, It does not work.
  

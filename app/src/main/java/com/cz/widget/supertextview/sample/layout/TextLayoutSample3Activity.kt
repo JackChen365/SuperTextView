@@ -1,8 +1,5 @@
 package com.cz.widget.supertextview.sample.layout
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.graphics.BlurMaskFilter
 import android.graphics.Color
 import android.graphics.EmbossMaskFilter
@@ -11,7 +8,6 @@ import android.os.Bundle
 import android.text.Spannable
 import android.view.LayoutInflater
 import android.widget.TextView
-import android.widget.Toast
 import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
 import com.cz.widget.supertextview.library.style.ReplacementSpan

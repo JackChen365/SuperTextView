@@ -12,6 +12,7 @@ import com.cz.widget.supertextview.library.Styled;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.span.ViewSpan;
+import com.cz.widget.supertextview.library.view.TextParent;
 
 /**
  * 文本行信息
@@ -285,7 +286,7 @@ public class TextLine {
     /**
      * 排版子控件
      */
-    public void layoutViewSpan(ViewGroup parentView,CharSequence source, int left, int top) {
+    public void layoutViewSpan(TextParent parentView, CharSequence source, int left, int top) {
         if(source instanceof Spanned){
             Spanned spanned = (Spanned) source;
             int newLineTop = getDecoratedScrollLineTop();
