@@ -7,14 +7,14 @@
         It seems impossible for me. Then I stopped that project and start this project. Before I start, I did a ton of research about the android TextView in order to solve performance issues and try to have a powerful text style foundation. Now that is what we have.
 
 
-### Sample下载
-[apk file](apk/app-debug.apk)
+### Sample 下载
+[apk file](https://github.com/momodae/SuperTextView/blob/master/apk/app-debug.apk?raw=true)
     
 ### Pictures
 
-![Image1](image/image1.gif)<br>
-![Image2](image/image2.gif)<br>
-![Image3](image/image3.gif)<br>
+![Image1](https://github.com/momodae/SuperTextView/blob/master/image/image1.gif?raw=true)<br>
+![Image2](https://github.com/momodae/SuperTextView/blob/master/image/image2.gif?raw=true)<br>
+![Image3](https://github.com/momodae/SuperTextView/blob/master/image/image3.gif?raw=true)<br>
 
 ### 如何使用
 
