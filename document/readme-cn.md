@@ -1,9 +1,7 @@
 ## TextLayout
 
-> About this library<br>
-This library was an android text process library but now expend from the text, by extending from the ViewGroup to make more change
-        A couple of months ago, I try to write a project that process text and view together. It took me one week, and I wrap it up. But I realized I just do a lot of work for the first time. Never mentioned I want to have some functions like line animation
-        It seems impossible for me. Then I stopped that project and start this project. Before I start, I did a ton of research about the android TextView in order to solve performance issues and try to have a powerful text style foundation. Now that is what we have.
+> 关于这个项目<br>
+8月份时,做了一个文本,与控件的复合处理控件,花了一周左右时间,是公司项目需要.但是在处理大量文本以及控件后,性能很差. 在我改用textView处理文本后,意外发现,差别竟然有10多倍.让我开始思考从TextView开始,扩展一个库,从ViewGroup继承.完成文本样式,以及控件的原生支持. 这就是写这个库的原因.本库大概开发了二个多月,对TextView做了大量的研究.都是利用业余时间开发.所以进度很慢.当前只是初步版本.仍然有很多bug.但有时间会持续改进.
 
 
 ### Sample 下载
