@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.view.Gravity;
+import android.view.ViewGroup;
 
 import com.cz.widget.supertextview.library.Styled;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
@@ -284,7 +285,7 @@ public class TextLine {
     /**
      * 排版子控件
      */
-    public void layoutViewSpan(CharSequence source,int left,int top) {
+    public void layoutViewSpan(ViewGroup parentView,CharSequence source, int left, int top) {
         if(source instanceof Spanned){
             Spanned spanned = (Spanned) source;
             int newLineTop = getDecoratedScrollLineTop();
@@ -302,9 +303,10 @@ public class TextLine {
                 } else if(Gravity.CENTER==newLineGravity){
                     int lineHeight=newLineBottom-newLineTop;
                     viewSpan.setLayoutTop(top+newLineTop+(lineHeight-viewHeight)/2);
-                } else if(Gravity.BOTTOM==newLineGravity){
-                    viewSpan.setLayoutTop(top+newLineBottom-viewHeight);
+                } else if(Gravity.BOTTOM==newLineGravity) {
+                    viewSpan.setLayoutTop(top + newLineBottom - viewHeight);
                 }
+                viewSpan.setParentView(parentView);
                 viewSpan.attachToView();
             }
         }

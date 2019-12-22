@@ -7,6 +7,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.ViewGroup;
 
 import com.cz.widget.supertextview.library.Styled;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
@@ -62,6 +63,7 @@ public class StaticLayout extends Layout {
     void fillText(CharSequence source, int bufferStart, int bufferEnd,
         TextPaint paint, int outerWidth, float spacingAdd, int align){
         List<TextLine> textLineList=new ArrayList<>();
+        ViewGroup parentView = textRender.getTarget();
         int end = TextUtils.indexOf(source, '\n', bufferStart, bufferEnd);
         int bufferSize = end >= 0 ? end - bufferStart : bufferEnd - bufferStart;
         if (charArrays == null) {
@@ -87,7 +89,7 @@ public class StaticLayout extends Layout {
             for(int i=0;i<paragraph.lineCount;i++){
                 //排版子控件
                 TextLine textLine = paragraph.textLines[i];
-                textLine.layoutViewSpan(source,0,0);
+                textLine.layoutViewSpan(parentView,source,0,0);
                 textLineList.add(textLine);
             }
             //记录最后一个行底部距离

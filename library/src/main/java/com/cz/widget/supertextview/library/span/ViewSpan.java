@@ -31,6 +31,13 @@ public class ViewSpan extends ReplacementSpan {
     private int layoutTop;
 
     public ViewSpan(View view) {
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if(!(layoutParams instanceof FlowLayoutParams)){
+            throw new IllegalArgumentException("When you use The ViewSpan you should use TextLayout as your parentView to inflate the view. Please check your code!");
+        } else {
+            FlowLayoutParams flowLayoutParams = (FlowLayoutParams) layoutParams;
+            flowLayoutParams.token =this;
+        }
         this.view = view;
     }
 

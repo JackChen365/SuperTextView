@@ -23,6 +23,13 @@
         android:layout_gravity="right|bottom"
         android:gravity="right"
         android:layout_margin="4dp">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/textButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:textAllCaps="false"
+            android:text="text"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/flowButton"

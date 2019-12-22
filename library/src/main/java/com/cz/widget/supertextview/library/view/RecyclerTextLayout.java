@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Build;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -28,8 +27,6 @@ import com.cz.widget.supertextview.library.layout.Layout;
 import com.cz.widget.supertextview.library.layout.RecyclerStaticLayout;
 import com.cz.widget.supertextview.library.render.DefaultTextRender;
 import com.cz.widget.supertextview.library.render.TextRender;
-import com.cz.widget.supertextview.library.span.ViewSpan;
-import com.cz.widget.supertextview.library.spannable.SpannableString;
 
 /**
  *
@@ -88,6 +85,7 @@ public class RecyclerTextLayout extends ViewGroup{
     public RecyclerTextLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
+        textRender.setTarget(this);
         startEdge = new EdgeEffect(context);
         endEdge = new EdgeEffect(context);
 
@@ -135,25 +133,6 @@ public class RecyclerTextLayout extends ViewGroup{
      */
     public void setText(CharSequence text){
         this.text=text;
-        if(text instanceof SpannableString){
-            SpannableString spannableString=(SpannableString)text;
-            ViewSpan[] viewSpans = spannableString.getSpans(0, text.length(), ViewSpan.class);
-            for(int i=0;i<viewSpans.length;i++){
-                ViewSpan viewSpan = viewSpans[i];
-                View child = viewSpan.getView();
-                //添加view
-                LayoutParams params = child.getLayoutParams();
-                if (params == null) {
-                    params = generateDefaultLayoutParams();
-                    if (params == null) {
-                        throw new IllegalArgumentException("generateDefaultLayoutParams() cannot return null");
-                    }
-                }
-                FlowLayoutParams flowLayoutParams = (FlowLayoutParams) params;
-                flowLayoutParams.viewSpan=viewSpan;
-                viewSpan.setParentView(this);
-            }
-        }
         requestLayout();
     }
 
@@ -192,7 +171,7 @@ public class RecyclerTextLayout extends ViewGroup{
     @Override
     public void addView(View child, int index, LayoutParams params) {
         FlowLayoutParams flowLayoutParams = (FlowLayoutParams) params;
-        if(null==flowLayoutParams.viewSpan){
+        if(null==flowLayoutParams.token){
             throw new IllegalArgumentException("TextLayout Can't not add view in code! You should use spannableString to add ViewSpan!");
         }
         super.addView(child,index,params);
@@ -230,7 +209,6 @@ public class RecyclerTextLayout extends ViewGroup{
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        long st=System.currentTimeMillis();
         //绘制选中
         if(null!=layout){
             //绘制越界边缘阴影
@@ -239,7 +217,6 @@ public class RecyclerTextLayout extends ViewGroup{
             canvas.translate(getPaddingLeft()*1f,getPaddingTop()*1f);
             layout.draw(canvas);
             canvas.restore();
-            Log.i(TAG,"time:"+(System.currentTimeMillis()-st)+" lineCount:"+layout.getLineCount());
         }
     }
 

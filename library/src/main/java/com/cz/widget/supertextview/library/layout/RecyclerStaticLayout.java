@@ -855,7 +855,8 @@ public class RecyclerStaticLayout extends Layout {
      */
     protected void onNewTextLineFilled(TextLine textLine){
         //排版子控件
-        textLine.layoutViewSpan(source,0,0);
+        ViewGroup target = textRender.getTarget();
+        textLine.layoutViewSpan(target,source,0,0);
         //回调文本渲染
         if(textLine instanceof TextParagraph){
             TextParagraph textParagraph = (TextParagraph) textLine;

@@ -9,7 +9,8 @@ import com.cz.widget.supertextview.sample.extension.SelectTextWordActivity
 import com.cz.widget.supertextview.sample.layout.TextLayoutSample1Activity
 import com.cz.widget.supertextview.sample.layout.TextLayoutSample2Activity
 import com.cz.widget.supertextview.sample.layout.TextLayoutSample3Activity
-import com.cz.widget.supertextview.sample.layout.TextLayoutSample4Activity
+import com.cz.widget.supertextview.sample.other.TestLayoutSampleActivity
+import com.cz.widget.supertextview.sample.other.TestPerformanceActivity
 
 /**
  * Created by cz on 2017/6/8.
@@ -79,7 +80,20 @@ class FuncTemplate {
             id = 6
             title = context?.getString(R.string.sample6)
             desc = context?.getString(R.string.sample_desc6)
-            clazz = TextLayoutSample4Activity::class.java
+            item {
+                pid = 6
+                title = context?.getString(R.string.sample6_1)
+                desc = context?.getString(R.string.sample_desc6_1)
+                clazz = TestLayoutSampleActivity::class.java
+
+            }
+            item {
+                pid = 6
+                title = context?.getString(R.string.sample6_2)
+                desc = context?.getString(R.string.sample_desc6_2)
+                clazz = TestPerformanceActivity::class.java
+
+            }
         }
         //分组
         groupItems += items.groupBy { it.pid }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.cz.widget.supertextview.library.view.RecyclerTextLayout
+        android:id="@+id/textLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="64dp"/>
+
+
+    <FrameLayout
+        android:layout_width="160dp"
+        android:layout_height="200dp"
+        android:layout_gravity="right|bottom"
+        android:background="@color/colorPrimary">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/textInformation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:textSize="12sp"/>
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
+</FrameLayout>

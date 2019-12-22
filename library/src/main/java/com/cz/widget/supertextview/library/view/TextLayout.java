@@ -72,7 +72,7 @@ public class TextLayout extends ViewGroup{
     public TextLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
-
+        textRender.setTarget(this);
         textPaint.setTextSize(getResources().getDimension(R.dimen.textSize));
         textPaint.setColor(Color.BLACK);
     }

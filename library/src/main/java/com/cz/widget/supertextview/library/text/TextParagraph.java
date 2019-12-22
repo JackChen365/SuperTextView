@@ -3,6 +3,7 @@ package com.cz.widget.supertextview.library.text;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.TextPaint;
+import android.view.ViewGroup;
 
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.render.TextRender;
@@ -73,11 +74,11 @@ public class TextParagraph extends TextLine{
     /**
      * 排版子控件
      */
-    public void layoutViewSpan(CharSequence source,int left,int top) {
+    public void layoutViewSpan(ViewGroup parentView,CharSequence source,int left,int top) {
         int lineTop = getLineTop();
         for(int i=0;i<lineCount;i++){
             TextLine textLine = textLines[i];
-            textLine.layoutViewSpan(source,0,lineTop);
+            textLine.layoutViewSpan(parentView,source,0,lineTop);
         }
     }
     public int getLineLeft(int line){

@@ -18,7 +18,7 @@ public class FlowLayoutParams extends ViewGroup.MarginLayoutParams {
     /**
      * 依附的span对象
      */
-    public ViewSpan viewSpan;
+    public ViewSpan token;
 
     public FlowLayoutParams(Context c, AttributeSet attrs) {
         super(c, attrs);

@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".layout.TextLayoutSample4Activity"></activity>
+        <activity android:name=".other.TestPerformanceActivity"></activity>
+        <activity android:name=".other.TestLayoutSampleActivity" />
         <activity android:name=".extension.SelectTextActivity" />
         <activity android:name=".animation.AnimationText1Activity" />
         <activity android:name=".extension.SelectTextWordActivity" />

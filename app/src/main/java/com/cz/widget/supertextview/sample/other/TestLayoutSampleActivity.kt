@@ -1,4 +1,4 @@
-package com.cz.widget.supertextview.sample.layout
+package com.cz.widget.supertextview.sample.other
 
 import android.os.Bundle
 import android.text.Spannable
@@ -15,7 +15,7 @@ import com.cz.widget.supertextview.sample.linedecoration.HighlightLineDecoration
 import com.cz.widget.supertextview.sample.template.ToolBarActivity
 import kotlinx.android.synthetic.main.activity_text_layout_sample4.*
 
-class TextLayoutSample4Activity : ToolBarActivity() {
+class TestLayoutSampleActivity : ToolBarActivity() {
     companion object{
         private const val SPAN_COUNT=6
     }
@@ -29,12 +29,16 @@ class TextLayoutSample4Activity : ToolBarActivity() {
         //点击设置不同的布局
         lineDecoration=HighlightLineDecoration(this)
         //设置不同模式下添加不同控件
+
         flowButton.setOnClickListener { appendTextSpan(0) }
         paragraphButton.setOnClickListener { appendTextSpan(1) }
         paragraphLineButton.setOnClickListener { appendTextSpan(2) }
         breakLineButton.setOnClickListener { appendTextSpan(3) }
         considerBreakLineButton.setOnClickListener { appendTextSpan(4) }
         singleLineButton.setOnClickListener { appendTextSpan(5) }
+        textButton.setOnClickListener {
+            appendTextSpan(6)
+        }
         clearButton.setOnClickListener {
             spanList.clear()
             textLayout.clear()
@@ -50,7 +54,9 @@ class TextLayoutSample4Activity : ToolBarActivity() {
             //文本
             val textSpan = getTextSpan(index)
             start = text.indexOf(' ',start+1)
-            spannableString.setSpan(textSpan,start, Math.min(text.length,start+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if(null!=textSpan){
+                spannableString.setSpan(textSpan,start, Math.min(text.length,start+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
         textLayout.clear()
         textLayout.setLineDecoration(lineDecoration)

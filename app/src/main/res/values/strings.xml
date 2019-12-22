@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TextLayout演示</string>
-    <string name="operation_panel" >操作面板</string>
+    <string name="operation_panel">操作面板</string>
     <string-array name="spanArray">
         <item>View</item>
         <item>图片</item>
@@ -30,7 +30,7 @@
     <string name="data_init_message">初始化过程中,会随机添加一批样式</string>
 
     <string name="login">点  击  登  陆</string>
-    <string name="loading" >加载中...</string>
+    <string name="loading">加载中...</string>
 
     <string name="sample1">TextLayout基本功能1</string>
     <string name="sample2">TextLayout基本功能2</string>
@@ -40,6 +40,8 @@
     <string name="sample5_1">选中单词</string>
     <string name="sample5_2">选中文本</string>
     <string name="sample6">其他测试</string>
+    <string name="sample6_1">排版测试</string>
+    <string name="sample6_2">性能测试</string>
 
     <string name="sample_desc1">演示TextLayout文本排版,以及控件,Span排版功能</string>
     <string name="sample_desc2">演示TextLayout动态添加各种元素</string>
@@ -49,4 +51,6 @@
     <string name="sample_desc5_1">演示点击选中单词</string>
     <string name="sample_desc5_2">演示选中滑动文本</string>
     <string name="sample_desc6">演示相关功能测试</string>
+    <string name="sample_desc6_1">测试不同模式下控件排版</string>
+    <string name="sample_desc6_2">演示各种操作性能</string>
 </resources>

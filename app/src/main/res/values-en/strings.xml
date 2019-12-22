@@ -42,6 +42,8 @@
     <string name="sample5_1">Select word</string>
     <string name="sample5_2">Select text</string>
     <string name="sample6">Others</string>
+    <string name="sample6_1">Layout Test</string>
+    <string name="sample6_2">Performance Test</string>
 
     <string name="sample_desc1">The sample shows how the text layout, support style and paragraph layout</string>
     <string name="sample_desc2">The sample shows how the text layout, support style and paragraph layout but with a random data</string>
@@ -51,4 +53,6 @@
     <string name="sample_desc5_1">Click select the word</string>
     <string name="sample_desc5_2">Select all the text that follow your finger</string>
     <string name="sample_desc6">The other test functions</string>
+    <string name="sample_desc6_1">Test different layout mode such as break line or single line</string>
+    <string name="sample_desc6_2">Test measure draw time</string>
 </resources>

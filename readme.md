@@ -1,12 +1,12 @@
 ## TextLayout
 
-> About this library
-This library was an android text process library but now expend from the text, by extending from the ViewGroup to make more change
-        A couple of months ago, I try to write a project that process text and view together. It took me one week, and I wrap it up. But I realized I just do a lot of work for the first time. Never mentioned I want to have some functions like line animation
-        It seems impossible for me. Then I stopped that project and start this project. Before I start, I did a ton of research about the android TextView in order to solve performance issues and try to have a powerful text style foundation. Now that is what we have.
+> About this library<br>
+> This library was an android text process library but now expend from the text, by extending from the ViewGroup to make more change
+A couple of months ago, I try to write a project that process text and view together. It took me one week, and I wrap it up. But I realized I just do a lot of work for the first time. Never mentioned I want to have some functions like line animation
+It seems impossible for me. Then I stopped that project and start this project. Before I start, I did a ton of research about the android TextView in order to solve performance issues and try to have a powerful text style foundation. Now that is what we have.
 
 
-#### [中文文档](document/readme-en.md)
+#### [中文文档](document/readme-cn.md)
 
 ### Sample download
 [apk file](https://github.com/momodae/SuperTextView/blob/master/apk/app-debug.apk?raw=true)
@@ -103,8 +103,8 @@ public class HighlightLineDecoration extends LineDecoration {
 5. The TextRender. You know The textView wants to save more memory so all the information was in Layout. If you want to change how to render text information. You have to implement your own text layout. That's way too much work to do, I gave it up. That's why In this project I want to have a function that I could easily change the rules. 
 The TextRender is works for that.
 
-See [DefaultTextRender](library/src/main/java/com/cz/widget/supertextview/library/render/DefaultTextRender)
-See [SimpleTextAnimation](library/src/main/java/com/cz/widget/supertextview/library/animation/SimpleTextAnimation)
+See [DefaultTextRender](library/src/main/java/com/cz/widget/supertextview/library/render/DefaultTextRender)<br>
+See [SimpleTextAnimation](library/src/main/java/com/cz/widget/supertextview/library/animation/SimpleTextAnimation)<br>
 
 *Warning:*
 If you want to have your own TextRender. Make sure when the view call the method:drawText/drawReplacementSpan you or you will lost all the information 
@@ -160,7 +160,7 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 ```
 
 * RecyclerTextLayout When I calculate one paragraph I cached the paragraph object to a RecyclerPool. I didn't finish this function
-Cause I have to give the chance release the cache.
+That I have to give the chance release the cache.
 
 ```
 
