@@ -1,7 +1,7 @@
 ## TextLayout
 
 > About this library<br>
-> This library was an android text process library but now expend from the text, by extending from the ViewGroup to make more change
+> This library was an android text process library but not expend from the text, by extending from the ViewGroup to make more change
 A couple of months ago, I try to write a project that process text and view together. It took me one week, and I wrap it up. But I realized I just do a lot of work for the first time. Never mentioned I want to have some functions like line animation
 It seems impossible for me. Then I stopped that project and start this project. Before I start, I did a ton of research about the android TextView in order to solve performance issues and try to have a powerful text style foundation. Now that is what we have.
 
