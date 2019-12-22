@@ -16,9 +16,9 @@ import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
 import com.cz.widget.supertextview.library.style.ReplacementSpan
 import com.cz.widget.supertextview.sample.R
+import com.cz.widget.supertextview.sample.data.Data
 import com.cz.widget.supertextview.sample.linedecoration.HighlightLineDecoration
-import com.okay.sampletamplate.ToolBarActivity
-import com.okay.sampletamplate.data.DataProvider
+import com.cz.widget.supertextview.sample.template.ToolBarActivity
 import kotlinx.android.synthetic.main.activity_text_layout_sample2.*
 import kotlin.random.Random
 
@@ -50,9 +50,10 @@ class TextLayoutSample2Activity : ToolBarActivity() {
     }
 
     private fun createText(){
-        val spanCount=20+Random.nextInt(10)
-        val text=(0 until spanCount).
-            map { DataProvider.ITEMS[DataProvider.RANDOM.nextInt(DataProvider.ITEMS.size)] }.joinToString(" ")
+//        val spanCount=20+Random.nextInt(10)
+//        val text=(0 until spanCount).
+//            map { Data.ITEMS[Data.RANDOM.nextInt(Data.ITEMS.size)] }.joinToString(" ")
+        val text=assets.open("dynamic_chapter1").bufferedReader().readText()
         val spannableString=SpannableString(text)
         //初始化span
         var start=0
@@ -137,7 +138,7 @@ class TextLayoutSample2Activity : ToolBarActivity() {
                     1->{
                         val textLayout=layoutInflater.inflate(R.layout.text_layout1, textLayout, false)
                         val textView=textLayout.findViewById<TextView>(R.id.textView)
-                        textView.text=DataProvider.ITEMS[DataProvider.RANDOM.nextInt(DataProvider.ITEMS.size)]
+                        textView.text=Data.ITEMS[Data.RANDOM.nextInt(Data.ITEMS.size)]
                         textLayout
                     }
                     else->layoutInflater.inflate(R.layout.progress_layout1, textLayout, false)

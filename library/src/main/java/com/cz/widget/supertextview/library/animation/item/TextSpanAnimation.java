@@ -22,19 +22,29 @@ public class TextSpanAnimation extends BaseTextAnimation {
     }
 
     @Override
-    public void onDraw(Canvas canvas, float x, float y, TextPaint textPaint) {
-        super.onDraw(canvas, x, y, textPaint);
+    public void recycler() {
+        super.recycler();
+        replacementSpan=null;
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, TextPaint textPaint, CharSequence text, int start, int end, float x, float y, int top, int bottom) {
+        super.onDraw(canvas, textPaint, text, start, end, x, y, top, bottom);
         if(null!=replacementSpan){
             if(replacementSpan instanceof ViewSpan){
                 ViewSpan viewSpan = (ViewSpan) this.replacementSpan;
                 View view = viewSpan.getView();
                 float alpha = getAlpha();
+                float translationX = getTranslationX();
+                float translationY = getTranslationY();
                 view.setAlpha(alpha);
+                view.setTranslationX(translationX);
+                view.setTranslationY(translationY);
             } else {
                 CharSequence source = getSource();
-                int start = getStart();
-                int end = getEnd();
-                replacementSpan.draw(canvas,source,start,end,x,y,textPaint);
+                float offsetX = getX();
+                float offsetY = getY();
+                replacementSpan.draw(canvas,source,start,end,offsetX,offsetY,textPaint);
             }
         }
     }

@@ -329,7 +329,7 @@ public class TextLine {
         } else {
             int top = getScrollTop();
             int bottom = getScrollBottom();
-            Styled.drawText(canvas, textRender,text, lineStart, lineEnd, lineLeft, top, baseline, bottom,fontMetricsInt,paint, workPaint, lineAlign,false);
+            Styled.drawText(canvas, textRender,text, lineStart, lineEnd, lineLeft, top, baseline, bottom,fontMetricsInt,paint, workPaint, lineAlign);
         }
     }
 

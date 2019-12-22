@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TextLayout Sample</string>
+    <string name="operation_panel" >Operation Panel</string>
+    <string-array name="spanArray">
+        <item>View</item>
+        <item>Image</item>
+        <item>BackgroundColor</item>
+        <item>ForegroundColorSpan</item>
+        <item>RelativeSize</item>
+        <item>MaskFilter</item>
+        <item>EmbossMaskFilter</item>
+        <item>Strike through</item>
+        <item>Underline</item>
+        <item>AbsoluteSize</item>
+        <item>ScaleX</item>
+        <item>ScaleY</item>
+        <item>TextStyle</item>
+    </string-array>
+
+    <string-array name="layoutMode">
+        <item>Normal</item>
+        <item>Paragraph</item>
+        <item>ParagraphBreakLine</item>
+        <item>BreakLine</item>
+        <item>ConsiderBreakLine</item>
+        <item>SingleLine</item>
+    </string-array>
+    <string name="data_init">Data initializing</string>
+    <string name="data_init_message">Data initializing, We will add a few text style within text</string>
+
+    <string name="login">Click sign in</string>
+    <string name="loading" >Loading...</string>
+
+
+    <!--all the sample title and description-->
+    <string name="sample1">TextLayout Style1</string>
+    <string name="sample2">TextLayout Style2</string>
+    <string name="sample3">RecyclerTextLayout</string>
+    <string name="sample4">TextLayout Animation</string>
+    <string name="sample5">TextLayout Extension</string>
+    <string name="sample5_1">Select word</string>
+    <string name="sample5_2">Select text</string>
+    <string name="sample6">Others</string>
+
+    <string name="sample_desc1">The sample shows how the text layout, support style and paragraph layout</string>
+    <string name="sample_desc2">The sample shows how the text layout, support style and paragraph layout but with a random data</string>
+    <string name="sample_desc3">The sample shows how to load dynamic text in order to save the calculation time.</string>
+    <string name="sample_desc4">You can customize your own line animation or just do something special.</string>
+    <string name="sample_desc5">A few extra functions</string>
+    <string name="sample_desc5_1">Click select the word</string>
+    <string name="sample_desc5_2">Select all the text that follow your finger</string>
+    <string name="sample_desc6">The other test functions</string>
+</resources>

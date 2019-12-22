@@ -26,7 +26,6 @@ import com.cz.widget.supertextview.library.decoration.DefaultLineDecoration;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.layout.Layout;
 import com.cz.widget.supertextview.library.layout.RecyclerStaticLayout;
-import com.cz.widget.supertextview.library.render.Callback;
 import com.cz.widget.supertextview.library.render.DefaultTextRender;
 import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.span.ViewSpan;
@@ -45,7 +44,7 @@ import com.cz.widget.supertextview.library.spannable.SpannableString;
  *
 
  */
-public class RecyclerTextLayout extends ViewGroup implements Callback {
+public class RecyclerTextLayout extends ViewGroup{
     private static final String TAG="RecyclerTextLayout";
     /**
      * 绘制文本画笔对象
@@ -179,7 +178,7 @@ public class RecyclerTextLayout extends ViewGroup implements Callback {
                 layout = new RecyclerStaticLayout(text, textPaint, lineDecoration,textRender, outerWidth,outerHeight, 0f, Gravity.CENTER);
                 layout.setMeasureSpecs(widthMeasureSpec,heightMeasureSpec);
             } else if(outerHeight!=layout.getLayoutHeight()){
-                //外部高度变化,重新加载
+                //todo 外部高度变化,重新加载
 //                layout.setLayoutHeight(outerHeight);
             }
         }

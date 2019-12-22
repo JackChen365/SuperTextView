@@ -3,7 +3,6 @@
     package="com.cz.widget.supertextview.sample">
 
     <application
-        android:name=".SampleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -12,17 +11,14 @@
         android:theme="@style/AppTheme">
         <activity android:name=".layout.TextLayoutSample4Activity"></activity>
         <activity android:name=".extension.SelectTextActivity" />
-        <activity android:name=".animation.AnimationText2Activity" />
         <activity android:name=".animation.AnimationText1Activity" />
         <activity android:name=".extension.SelectTextWordActivity" />
         <activity
             android:name=".layout.TextLayoutSample3Activity"
-            android:label="@string/title_activity_text_layout_sample3"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".layout.TextLayoutSample2Activity" />
         <activity
             android:name=".layout.TextLayoutSample1Activity"
-            android:label="@string/title_activity_text_layout_sample1"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MainActivity">
             <intent-filter>

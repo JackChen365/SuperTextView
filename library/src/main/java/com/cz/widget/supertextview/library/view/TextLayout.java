@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Build;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -19,9 +18,7 @@ import com.cz.widget.supertextview.library.R;
 import com.cz.widget.supertextview.library.decoration.DefaultLineDecoration;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.layout.Layout;
-import com.cz.widget.supertextview.library.layout.RecyclerStaticLayout;
 import com.cz.widget.supertextview.library.layout.StaticLayout;
-import com.cz.widget.supertextview.library.render.Callback;
 import com.cz.widget.supertextview.library.render.DefaultTextRender;
 import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.span.ViewSpan;
@@ -39,7 +36,7 @@ import com.cz.widget.supertextview.library.spannable.SpannableString;
  * 2. 优化渲染
  * 3. 优化动态修改
  */
-public class TextLayout extends ViewGroup implements Callback {
+public class TextLayout extends ViewGroup{
     private static final String TAG="TextLayout";
     /**
      * 绘制文本画笔对象
@@ -139,8 +136,8 @@ public class TextLayout extends ViewGroup implements Callback {
             if(null==layout||text!=layout.getText()){
                 layout = new StaticLayout(text, textPaint, lineDecoration,textRender, outerWidth, 0f, gravity);
             } else if(outerHeight!=layout.getLayoutHeight()){
-                //外部高度变化,重新加载
-                layout.setLayoutHeight(outerHeight);
+                //todo 外部高度变化,重新加载
+                //layout.setLayoutHeight(outerHeight);
             }
         }
 //        //重新设置尺寸

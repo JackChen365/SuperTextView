@@ -17,7 +17,6 @@ buildscript {
 
 allprojects {
     repositories {
-        maven{ url "http://www.momoda.pro:8081/repository/maven/" }
         google()
         jcenter()
     }

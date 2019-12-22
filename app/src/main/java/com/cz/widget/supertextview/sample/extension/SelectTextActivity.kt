@@ -11,7 +11,7 @@ import android.view.LayoutInflater
 import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
 import com.cz.widget.supertextview.sample.R
-import com.okay.sampletamplate.ToolBarActivity
+import com.cz.widget.supertextview.sample.template.ToolBarActivity
 import kotlinx.android.synthetic.main.activity_select_text2.*
 
 class SelectTextActivity : ToolBarActivity() {

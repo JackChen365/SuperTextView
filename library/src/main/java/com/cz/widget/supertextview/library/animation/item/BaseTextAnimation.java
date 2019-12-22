@@ -31,51 +31,51 @@ public class BaseTextAnimation {
     /**
      * 当前文本
      */
-    private CharSequence source;
+    CharSequence source;
     /**
      * 文本起始
      */
-    private int start;
+    int start;
     /**
      * 文本结束
      */
-    private int end;
+    int end;
     /**
      * 测试当前元素颜色
      */
-    private int color;
+    int color;
     /**
      * 文字透明度
      */
-    private float alpha=1f;
+    float alpha=1f;
     /**
      * 平移x轴位置
      */
-    private float translationX;
+    float translationX;
     /**
      * 平移y轴位置
      */
-    private float translationY;
+    float translationY;
     /**
      * 旋转方向0~360
      */
-    private float rotate=0f;
+    float rotate=0f;
     /**
      * 指定的裁切区域
      */
-    private RectF clipRect;
+    RectF clipRect;
     /**
      * 裁切模式
      */
-    private Region.Op op;
+    Region.Op op;
     /**
      * 当前文本元素测试矩阵
      */
-    private final RectF bounds=new RectF();
+    final RectF bounds=new RectF();
     /**
      * 关联本对象的动画对象
      */
-    protected ObjectAnimator objectAnimator;
+    ObjectAnimator objectAnimator;
 
     protected BaseTextAnimation() {
     }
@@ -342,20 +342,8 @@ public class BaseTextAnimation {
      * 绘制信息
      * @param canvas
      */
-    public void draw(Canvas canvas,TextPaint textPaint, TextPaint workPaint) {
-        //开始绘图
-        canvas.save();
-        //旋转
-        canvas.rotate(rotate);
-        //渐变
-        workPaint.setAlpha((int) (alpha*0xFF));
-        //剪切指定矩阵
-        if(null!=clipRect&&null!=op){
-            canvas.clipRect(clipRect, op);
-        }
-        //绘制元素
-        onDraw(canvas,translationX+bounds.left,translationY+bounds.top,workPaint);
-        canvas.restore();
+    public void draw(Canvas canvas,TextPaint textPaint, CharSequence text, int start, int end, float x, float y,int top,int bottom) {
+        onDraw(canvas,textPaint,text,start,end,x,y,top,bottom);
     }
 
     /**
@@ -363,6 +351,6 @@ public class BaseTextAnimation {
      * @param canvas
      * @param textPaint
      */
-    public void onDraw(Canvas canvas,float x,float y, TextPaint textPaint){
+    public void onDraw(Canvas canvas,TextPaint textPaint, CharSequence text, int start, int end, float x, float y,int top,int bottom){
     }
 }

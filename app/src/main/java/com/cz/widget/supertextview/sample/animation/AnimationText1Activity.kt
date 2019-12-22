@@ -13,10 +13,9 @@ import com.cz.widget.supertextview.library.span.*
 import com.cz.widget.supertextview.library.spannable.SpannableString
 import com.cz.widget.supertextview.library.style.ReplacementSpan
 import com.cz.widget.supertextview.sample.R
-import com.cz.widget.supertextview.sample.layout.TextLayoutSample3Activity
+import com.cz.widget.supertextview.sample.data.Data
 import com.cz.widget.supertextview.sample.linedecoration.HighlightLineDecoration
-import com.okay.sampletamplate.ToolBarActivity
-import com.okay.sampletamplate.data.DataProvider
+import com.cz.widget.supertextview.sample.template.ToolBarActivity
 import kotlinx.android.synthetic.main.activity_animation_text1.*
 import kotlin.random.Random
 
@@ -32,24 +31,52 @@ class AnimationText1Activity : ToolBarActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_animation_text1)
         lineDecoration=HighlightLineDecoration(this)
-
-        val text="Carre de l'Est Swiss Sap Sago Oschtjepka Capriole Banon Brie de Meaux Sainte Maure Acorn Pelardon des Corbieres Grand Vatel Abbaye de Belloc Frinault Venaco Pave de Chirac Olde York Kashta Petit-Suisse Cornish Pepper Truffe Allgauer Emmentaler Vendomois"
+        val text=assets.open("dynamic_chapter1").bufferedReader().readText()
         val spannableString=SpannableString(text)
-        val positionList= mutableListOf(5, 8, 14, 20, 24, 29, 40, 49, 55, 60, 63, 69, 76, 82, 88, 97, 101, 111, 117, 123, 130, 133, 140, 149, 156, 161, 164, 171, 176, 181, 188, 201, 209, 216, 223, 232, 243)
-        val spanPositionList= mutableListOf(12, 1, 6, 2, 9, 6, 4, 12, 6, 6, 3, 0, 5, 5, 4, 9, 0, 9, 4, 0, 1, 0, 5, 8, 6, 6, 7, 5, 2, 10, 5, 0, 8, 10, 11, 3, 7)
-        positionList.forEachIndexed { index, position->
-            var textSpan = getTextSpan(spanPositionList[index])
-            if(textSpan is ReplacementSpan){
-                spannableString.setSpan(textSpan, position, position+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            } else {
-                spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//        初始化span
+        var start=0
+        val positionList= mutableListOf<Int>()
+        val spanPositionList= mutableListOf<Int>()
+        var index=0
+        while(-1!=start){
+            val i= Random.nextInt(SPAN_COUNT)
+            index=text.indexOf(" ",start+1)
+            if(-1!=index){
+                spanPositionList.add(i)
+                val textSpan = getTextSpan(i)
+                if(null!=textSpan){
+                    positionList.add(index)
+                    if(textSpan is ReplacementSpan){
+                        spannableString.setSpan(textSpan,index, Math.min(text.length,index+1), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    } else {
+                        spannableString.setSpan(textSpan, index, Math.min(text.length,index+5), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                }
             }
+            start=index
         }
-        //更新布局
         textLayout.clear()
-        textLayout.textRender=SimpleTextAnimation()
         textLayout.setLineDecoration(lineDecoration)
-        textLayout.setText(spannableString)
+        textLayout.textRender=SimpleTextAnimation()
+        textLayout.text = spannableString
+
+//        val text="Carre de l'Est Swis"
+//        val spannableString=SpannableString(text)
+//        val positionList= mutableListOf(14)
+//        val spanPositionList= mutableListOf(2)
+//        positionList.forEachIndexed { index, position->
+//            var textSpan = getTextSpan(spanPositionList[index])
+//            if(textSpan is ReplacementSpan){
+//                spannableString.setSpan(textSpan, position, position+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            } else {
+//                spannableString.setSpan(textSpan, position, position+5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            }
+//        }
+//        //更新布局
+//        textLayout.clear()
+//        textLayout.setLineDecoration(lineDecoration)
+//        textLayout.textRender=SimpleTextAnimation()
+//        textLayout.setText(spannableString)
 
     }
 
@@ -67,7 +94,7 @@ class AnimationText1Activity : ToolBarActivity() {
                     1->{
                         val textLayout=layoutInflater.inflate(R.layout.text_layout1, textLayout, false)
                         val textView=textLayout.findViewById<TextView>(R.id.textView)
-                        textView.text= DataProvider.ITEMS[DataProvider.RANDOM.nextInt(DataProvider.ITEMS.size)]
+                        textView.text= Data.ITEMS[Data.RANDOM.nextInt(Data.ITEMS.size)]
                         textLayout
                     }
                     else->layoutInflater.inflate(R.layout.progress_layout1, textLayout, false)

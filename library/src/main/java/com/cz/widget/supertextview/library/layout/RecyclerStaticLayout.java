@@ -125,7 +125,7 @@ public class RecyclerStaticLayout extends Layout {
      * @return
      */
     Paragraph fillParagraphText(int index,CharSequence source, int bufferStart, int bufferEnd,
-                                TextPaint paint, int outerWidth, float spacingAdd, int align) {
+                                TextPaint paint, int outerWidth,int v, float spacingAdd, int align) {
         Paint.FontMetricsInt fm = fontMetricsInt;
         char[] chs = charArrays;
         float[] widths = this.widths;
@@ -158,7 +158,6 @@ public class RecyclerStaticLayout extends Layout {
         //获得行偏移
         lineDecoration.getLineOffsets(paragraph.index,paragraph.lineCount, decorationTmpRect);
         float w = decorationTmpRect.left;
-        int v = 0;
         int here = start;
 
         int ok = start;
@@ -751,9 +750,9 @@ public class RecyclerStaticLayout extends Layout {
             Paragraph previousParagraph = recyclerPool.getParagraph(paragraphIndex-1);
             int bufferStart=null == previousParagraph ? 0:previousParagraph.getLineLatterEnd(previousParagraph.lineCount-1)+1;
             if(DIRECTION_END==itemDirection){
-                paragraph = fillParagraphText(paragraphIndex, source, bufferStart, source.length(), paint, width, spacingAdd, textAlign);
+                paragraph = fillParagraphText(paragraphIndex, source, bufferStart, source.length(), paint, width, 0,spacingAdd, textAlign);
             } else if(DIRECTION_START==itemDirection){
-                paragraph = fillParagraphText(paragraphIndex, source, 0, bufferStart, paint, width, spacingAdd, textAlign);
+                paragraph = fillParagraphText(paragraphIndex, source, 0, bufferStart, paint, width, 0,spacingAdd, textAlign);
             }
             recyclerPool.putParagraph(paragraphIndex,paragraph);
         }
@@ -860,21 +859,26 @@ public class RecyclerStaticLayout extends Layout {
         //回调文本渲染
         if(textLine instanceof TextParagraph){
             TextParagraph textParagraph = (TextParagraph) textLine;
+            int paragraphLineTop = textLine.getDecoratedScrollLineTop();
             for(int i=0;i<textParagraph.lineCount;i++){
                 TextLine paragraphTextLine = textParagraph.textLines[i];
                 int lineStart = paragraphTextLine.getLineStart();
                 int lineEnd = paragraphTextLine.getLineEnd();
                 int lineLeft = paragraphTextLine.getLineLeft();
-                int lineTop = paragraphTextLine.getDecoratedLineTop();
-                Styled.onTextLineAdded(textRender,paint,workPaint,source,lineStart,lineEnd,lineLeft,lineTop);
+                int lineTop = paragraphLineTop+paragraphTextLine.getLineTop();
+                int lineBottom = paragraphLineTop+paragraphTextLine.getLineBottom();
+                int lineAlign = paragraphTextLine.getLineAlign();
+                Styled.onTextLineAdded(textRender,paint,workPaint,fontMetricsInt,source,lineStart,lineEnd,lineLeft,lineTop,lineBottom,lineAlign);
             }
         } else {
             //移除文本信息
             int lineStart = textLine.getLineStart();
             int lineEnd = textLine.getLineEnd();
             int lineLeft = textLine.getLineLeft();
-            int lineTop = textLine.getDecoratedLineTop();
-            Styled.onTextLineAdded(textRender,paint,workPaint,source,lineStart,lineEnd,lineLeft,lineTop);
+            int lineTop = textLine.getDecoratedScrollLineTop();
+            int lineBottom = textLine.getDecoratedScrollLineBottom();
+            int lineAlign = textLine.getLineAlign();
+            Styled.onTextLineAdded(textRender,paint,workPaint,fontMetricsInt,source,lineStart,lineEnd,lineLeft,lineTop,lineBottom,lineAlign);
         }
     }
 

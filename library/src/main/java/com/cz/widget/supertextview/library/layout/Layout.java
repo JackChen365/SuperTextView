@@ -353,26 +353,5 @@ public abstract class Layout {
      * Draw this Layout on the specified Canvas.
      */
     public void draw(Canvas c) {
-        TextPaint paint = this.paint;
-        CharSequence buf = text;
-        boolean spannedText = this.spannedText;
-        int lineCount = getLineCount();
-        for (int i = 0; i < lineCount; i++) {
-            int left = getLineStart(i);
-            int lineTop = getDecoratedScrollLineTop(i);
-            int lineBottom = getDecoratedScrollLineBottom(i);
-            int start = getLineLatterStart(i);
-            int end = getLineLatterEnd(i);
-            int baseline = lineBottom - getDecoratedDescent(i);
-            int x= left;
-            if (!spannedText) {
-                c.drawText(buf, start, end, x, baseline, paint);
-            } else {
-                int lineGravity = getLineGravity(i);
-                Styled.drawText(c,textRender, buf, start, end, x, lineTop, baseline, lineBottom,fontMetricsInt,paint, workPaint,lineGravity,false);
-            }
-        }
-        //绘制其他元素
-        textRender.onDraw(c);
     }
 }

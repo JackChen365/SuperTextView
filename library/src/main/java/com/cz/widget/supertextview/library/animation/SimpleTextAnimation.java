@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -19,7 +18,6 @@ import com.cz.widget.supertextview.library.style.ReplacementSpan;
  * 动画的文本渲染器，用于扩展文本动画
  */
 public class SimpleTextAnimation extends TextRender {
-    private static final String TAG="SimpleTextAnimation";
     /**
      * 当前文本绘制区域
      */
@@ -39,7 +37,7 @@ public class SimpleTextAnimation extends TextRender {
         animationItemArray.put(start,textAnimation);
         View target = getTarget();
         textAnimation.setTarget(target);
-        textAnimation.setDuration(600);
+//        textAnimation.setDuration(600);
         textAnimation.setText(text,start,end);
         int textHeight= fontMetricsInt.descent-fontMetricsInt.ascent;
         textAnimation.setBounds(Math.round(x),Math.round(y), Math.round(x+textWidth),Math.round(y+textHeight));
@@ -56,15 +54,16 @@ public class SimpleTextAnimation extends TextRender {
     }
 
     @Override
-    public void addReplacementSpan(ReplacementSpan span,CharSequence text, int start, int end, float x, float y,float width, TextPaint textPaint) {
+    public void addReplacementSpan(ReplacementSpan span,Paint.FontMetricsInt fontMetricsInt,CharSequence text, int start, int end, float x, float y,float width) {
         //添加新的字符元素
-        Paint.FontMetricsInt fontMetricsInt = textPaint.getFontMetricsInt();
         PropertyValuesHolder alphaValueHolder = PropertyValuesHolder.ofFloat("alpha", 0f,1f);
-        TextSpanAnimation textAnimation = TextSpanAnimation.ofPropertyValuesHolder(TextSpanAnimation.class,alphaValueHolder);
+        PropertyValuesHolder translationXValueHolder = PropertyValuesHolder.ofFloat("translationX",-x,0);
+        TextSpanAnimation textAnimation = TextSpanAnimation.ofPropertyValuesHolder(TextSpanAnimation.class,alphaValueHolder,translationXValueHolder);
         animationItemArray.put(start,textAnimation);
         textAnimation.setReplacementSpan(span);
         View target = getTarget();
         textAnimation.setTarget(target);
+//        textAnimation.setDuration(600);
         textAnimation.setText(text,start,end);
         int textHeight= fontMetricsInt.descent-fontMetricsInt.ascent;
         textAnimation.setBounds(Math.round(x),Math.round(y), Math.round(x+width),Math.round(y+textHeight));
@@ -81,21 +80,20 @@ public class SimpleTextAnimation extends TextRender {
     }
 
     @Override
-    public void drawReplacementSpan(Canvas canvas, TextPaint textPaint, TextPaint workPaint,ReplacementSpan replacementSpan, CharSequence text, int start, int end, float x, float y) {
+    public void drawReplacementSpan(Canvas canvas, TextPaint textPaint, TextPaint workPaint,ReplacementSpan replacementSpan, CharSequence text, int start, int end, float x, float y,int top,int bottom) {
         BaseTextAnimation baseTextAnimation = animationItemArray.get(start);
         if(null!= baseTextAnimation){
-            baseTextAnimation.setY(y);
-            baseTextAnimation.draw(canvas,textPaint,textPaint);
+            baseTextAnimation.draw(canvas,workPaint,text,start,end,x,y,top,bottom);
         }
     }
 
     @Override
-    public void drawText(Canvas canvas,TextPaint textPaint,TextPaint workPaint, CharSequence text, int start, int end, float x, float y) {
+    public void drawText(Canvas canvas,TextPaint textPaint,CharSequence text, int start, int end, float x, float y,int top,int bottom) {
         //更新字符动画
         BaseTextAnimation baseTextAnimation = animationItemArray.get(start);
         if(null!= baseTextAnimation){
             baseTextAnimation.setY(y);
-            baseTextAnimation.draw(canvas,textPaint,workPaint);
+            baseTextAnimation.draw(canvas,textPaint,text,start,end,x,y,top,bottom);
         }
     }
 

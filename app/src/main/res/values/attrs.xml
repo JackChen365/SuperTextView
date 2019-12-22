@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--tableSpan的关联样式-->
+    <attr name="tableLayout" format="reference"/>
+    <!--tableSpan样式组-->
+    <declare-styleable name="TableLayout">
+        <!--表格分隔线-->
+        <attr name="table_borderSize" format="dimension"/>
+        <attr name="table_border" format="color"/>
+    </declare-styleable>
+</resources>

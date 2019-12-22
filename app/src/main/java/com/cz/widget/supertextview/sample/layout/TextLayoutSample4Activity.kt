@@ -10,9 +10,9 @@ import com.cz.widget.supertextview.library.span.ViewSpan
 import com.cz.widget.supertextview.library.spannable.SpannableString
 
 import com.cz.widget.supertextview.sample.R
+import com.cz.widget.supertextview.sample.data.Data
 import com.cz.widget.supertextview.sample.linedecoration.HighlightLineDecoration
-import com.okay.sampletamplate.ToolBarActivity
-import com.okay.sampletamplate.data.DataProvider
+import com.cz.widget.supertextview.sample.template.ToolBarActivity
 import kotlinx.android.synthetic.main.activity_text_layout_sample4.*
 
 class TextLayoutSample4Activity : ToolBarActivity() {
@@ -43,7 +43,7 @@ class TextLayoutSample4Activity : ToolBarActivity() {
 
     private fun appendTextSpan(spanIndex:Int){
         spanList.add(spanIndex)
-        val text= (0..spanList.size).joinToString(" ") { i -> DataProvider.ITEMS[i] }
+        val text= (0..spanList.size).joinToString(" ") { i -> Data.ITEMS[i] }
         val spannableString=SpannableString(text)
         var start=-1
         for(index in spanList){

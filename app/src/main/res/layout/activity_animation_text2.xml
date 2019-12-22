@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:text="Sample"
                 android:padding="12dp"
-                android:background="@color/lightGray"/>
+                android:background="@color/lightWhite"/>
 
             <com.cz.widget.supertextview.library.view.RecyclerTextLayout
                 android:id="@+id/textView1"

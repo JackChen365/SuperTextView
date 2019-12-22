@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">SuperTextView</string>
-    <string name="title_activity_text_layout_sample1">TextLayoutSample1Activity</string>
-    <string name="operation_panel">操作面板</string>
+    <string name="app_name">TextLayout演示</string>
+    <string name="operation_panel" >操作面板</string>
     <string-array name="spanArray">
         <item>View</item>
         <item>图片</item>
@@ -27,10 +26,27 @@
         <item>跟随占满</item>
         <item>独占一行</item>
     </string-array>
-    <string name="title_activity_text_layout_sample3">TextLayoutSample3Activity</string>
     <string name="data_init">数据初始化中</string>
     <string name="data_init_message">初始化过程中,会随机添加一批样式</string>
 
     <string name="login">点  击  登  陆</string>
-    <string name="loading">加载中...</string>
+    <string name="loading" >加载中...</string>
+
+    <string name="sample1">TextLayout基本功能1</string>
+    <string name="sample2">TextLayout基本功能2</string>
+    <string name="sample3">RecyclerTextLayout</string>
+    <string name="sample4">TextLayout Animation</string>
+    <string name="sample5">功能扩展</string>
+    <string name="sample5_1">选中单词</string>
+    <string name="sample5_2">选中文本</string>
+    <string name="sample6">其他测试</string>
+
+    <string name="sample_desc1">演示TextLayout文本排版,以及控件,Span排版功能</string>
+    <string name="sample_desc2">演示TextLayout动态添加各种元素</string>
+    <string name="sample_desc3">演示TextLayout动态优化运处及渲染</string>
+    <string name="sample_desc4">演示为每一行文本添加动画</string>
+    <string name="sample_desc5">演示一些其他扩展功能</string>
+    <string name="sample_desc5_1">演示点击选中单词</string>
+    <string name="sample_desc5_2">演示选中滑动文本</string>
+    <string name="sample_desc6">演示相关功能测试</string>
 </resources>

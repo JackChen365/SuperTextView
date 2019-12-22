@@ -1,5 +1,8 @@
 <resources>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="lineParagraphPadding">16dp</dimen>
     <dimen name="linePadding">8dp</dimen>
+    <dimen name="image_size">48dp</dimen>
 </resources>

@@ -1,6 +1,7 @@
 package com.cz.widget.supertextview.library.render;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.text.TextPaint;
 import android.view.View;
 
@@ -59,7 +60,7 @@ public abstract class TextRender {
      * @param x
      * @param y
      */
-    public abstract void addReplacementSpan(ReplacementSpan span,CharSequence text, int start, int end, float x, float y,float width,TextPaint textPaint);
+    public abstract void addReplacementSpan(ReplacementSpan span, Paint.FontMetricsInt fontMetricsInt,CharSequence text, int start, int end, float x, float y, float width);
 
     /**
      * 移除span信息信息
@@ -77,7 +78,7 @@ public abstract class TextRender {
      * @param y
      * @param textPaint
      */
-    public abstract void drawReplacementSpan(Canvas canvas, TextPaint textPaint,TextPaint workPaint,ReplacementSpan replacementSpan,CharSequence text, int start, int end, float x, float y);
+    public abstract void drawReplacementSpan(Canvas canvas, TextPaint textPaint,TextPaint workPaint,ReplacementSpan replacementSpan,CharSequence text, int start, int end, float x, float y,int top,int bottom);
 
     /**
      * 绘制文本信息
@@ -89,7 +90,7 @@ public abstract class TextRender {
      * @param y
      * @param textPaint
      */
-    public abstract void drawText(Canvas canvas,TextPaint textPaint,TextPaint workPaint,CharSequence text, int start, int end,float x,float y);
+    public abstract void drawText(Canvas canvas,TextPaint textPaint,CharSequence text, int start, int end,float x,float y,int top,int bottom);
 
     /**
      * 绘制其他元素

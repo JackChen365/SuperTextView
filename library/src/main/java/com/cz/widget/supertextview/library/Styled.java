@@ -60,57 +60,35 @@ public class Styled
 		if (spans.length > 0) {
 			for (int i = 0; i < spans.length; i++) {
 				CharacterStyle span = spans[i];
-
-				if (span instanceof ReplacementSpan) {
+ 				if (span instanceof ReplacementSpan) {
 					replacement = (ReplacementSpan)span;
-				}
-				else {
+				} else {
 					span.updateDrawState(workPaint);
 				}
 			}
 		}
-
         if (replacement == null) {
-            CharSequence tmp;
-            int tmpstart, tmpend;
-            tmp = text;
-            tmpstart = start;
-            tmpend = end;
             if (fmi != null) {
                 workPaint.getFontMetricsInt(fmi);
             }
-
+            if (needWidth) {
+                ret = workPaint.measureText(text,start,end);
+            }
             if (canvas != null) {
-                if (workPaint.bgColor != 0) {
-                    int c = workPaint.getColor();
-                    Paint.Style s = workPaint.getStyle();
-                    workPaint.setColor(workPaint.bgColor);
-                    workPaint.setStyle(Paint.Style.FILL);
-
-                    ret = workPaint.measureText(tmp, tmpstart, tmpend);
-
-                    canvas.drawRect(x, top, x + ret, bottom, workPaint);
-
-                    workPaint.setStyle(s);
-                    workPaint.setColor(c);
-                }
-                if (needWidth) {
-                    ret = workPaint.measureText(tmp, tmpstart, tmpend);
-                }
-                textRender.drawText(canvas,paint,workPaint,tmp,tmpstart,tmpend, x, y + workPaint.baselineShift);
+                textRender.drawText(canvas,workPaint,text,start,end, x, y + workPaint.baselineShift,top,bottom);
             }
         } else {
             ret = replacement.getSize(workPaint, text, start, end, fmi);
             if (canvas != null) {
                 if(Gravity.TOP==textGravity){
                     y = top;
-                    textRender.drawReplacementSpan(canvas,paint,workPaint, replacement,text, start, end, x, y);
+                    textRender.drawReplacementSpan(canvas,paint,workPaint, replacement,text, start, end, x, y,top,bottom);
                 } else if(Gravity.CENTER==textGravity){
                     y = top + ((bottom-top)-(fmi.descent-fmi.ascent)) /2;
-                    textRender.drawReplacementSpan(canvas,paint,workPaint, replacement,text, start, end, x, y);
+                    textRender.drawReplacementSpan(canvas,paint,workPaint, replacement,text, start, end, x, y,top,bottom);
                 } else {
                     y= (int) (bottom-(workPaint.descent()-workPaint.ascent()));
-                    textRender.drawReplacementSpan(canvas, paint,workPaint,replacement,text, start, end, x, y);
+                    textRender.drawReplacementSpan(canvas, paint,workPaint,replacement,text, start, end, x, y,top,bottom);
                 }
             }
         }
@@ -190,8 +168,7 @@ public class Styled
                                  Paint.FontMetricsInt fmi,
                                  TextPaint paint,
                                  TextPaint workPaint,
-                                 int textGravity,
-                                 boolean needWidth) {
+                                 int textGravity) {
 
         // XXX: It looks like all calls to this API match dir and runIsRtl, so
         // having both parameters is redundant and confusing.
@@ -199,8 +176,6 @@ public class Styled
         // fast path for unstyled text
         if (!(text instanceof Spanned)) {
             float ret = 0;
-            if (needWidth)
-                ret = paint.measureText(text, start, end);
             if (canvas != null)
                 canvas.drawText(text, start, end, x, y, paint);
 
@@ -230,7 +205,7 @@ public class Styled
             // way.
             x += drawUniformRun(canvas,textRender, sp, i, next,
                   x, top, y, bottom, fmi, paint, workPaint,
-                    textGravity,needWidth || next != end);
+                    textGravity,next != end);
 
             if (fmi != null) {
                 if (fmi.ascent < minAscent)
@@ -270,11 +245,10 @@ public class Styled
                                        Paint.FontMetricsInt fmi,
                                        TextPaint paint,
                                        TextPaint workPaint,
-                                       int lineGravity,
-                                       boolean needWidth) {
+                                       int lineGravity) {
         return drawDirectionalRun(canvas,textRender,text, start, end,
                        x, top, y, bottom, fmi, paint, workPaint,
-                       lineGravity,needWidth);
+                       lineGravity);
     }
 
     /**
@@ -337,7 +311,7 @@ public class Styled
      * @param end
      */
     public static void onTextLineAdded(TextRender textRender, TextPaint paint,
-                                       TextPaint workPaint, CharSequence text, int start, int end, int x, int y){
+                                       TextPaint workPaint, Paint.FontMetricsInt fontMetricsInt,CharSequence text, int start, int end, int x, int top, int bottom, int textGravity){
         Spanned spanned=(Spanned)text;
         int next;
         int left=x;
@@ -359,17 +333,25 @@ public class Styled
             }
             if (replacement == null) {
                 x += workPaint.measureText(text, i, next);
-                textRender.addText(text,i,next,left,y,x-left,workPaint);
+                textRender.addText(text,i,next,left,top,x-left,workPaint);
             } else {
-                x += replacement.getSize(workPaint, text, i,next, null);
-                textRender.addReplacementSpan(replacement,text, i,next,left,y,x-left,workPaint);
+                x += replacement.getSize(workPaint, text, i,next, fontMetricsInt);
+                if(Gravity.TOP==textGravity){
+                    textRender.addReplacementSpan(replacement,fontMetricsInt,text, i,next,left,top,x-left);
+                } else if(Gravity.CENTER==textGravity){
+                    top = top + ((bottom-top)-(fontMetricsInt.descent-fontMetricsInt.ascent)) /2;
+                    textRender.addReplacementSpan(replacement,fontMetricsInt,text, i,next,left,top,x-left);
+                } else {
+                    top= (int) (bottom-(workPaint.descent()-workPaint.ascent()));
+                    textRender.addReplacementSpan(replacement,fontMetricsInt,text, i,next,left,top,x-left);
+                }
             }
             left=x;
             from=next;
         }
         //回调最后一次
         if(from!=end){
-            textRender.addText(text,from,end,left,y,x-left,workPaint);
+            textRender.addText(text,from,end,left,top,x-left,workPaint);
         }
     }
 
