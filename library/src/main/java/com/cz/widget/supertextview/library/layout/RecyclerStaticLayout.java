@@ -4,9 +4,11 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.os.Build;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.util.Log;
+import android.util.LruCache;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,7 @@ import com.cz.widget.supertextview.library.utils.TextUtilsCompat;
 import com.cz.widget.supertextview.library.view.TextParent;
 
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * 自定义静态文本排版对象
@@ -963,9 +966,6 @@ public class RecyclerStaticLayout extends Layout {
     void removeTextLineFromStart(int index) {
         removeTextLineAt(index);
         //回收行信息
-        TextLine textLine = textLines[index];
-        //todo 回收段落
-        TextLine.recycle(textLine);
         textLines[index]=null;
         System.arraycopy(textLines,1, textLines,index, textLines.length-1);
         lineCount--;
@@ -1460,14 +1460,23 @@ public class RecyclerStaticLayout extends Layout {
         /**
          * 段落存放集合
          */
-        private final SparseArray<Paragraph> paragraphArray;
+        private LruCache<Integer,Paragraph> paragraphArray;
         /**
          * 设置保存最大数
          */
         private int maxCacheSize=2;
 
         public ParagraphRecyclerPool() {
-            this.paragraphArray =new SparseArray<>(2);
+            this.paragraphArray = new LruCache<Integer,Paragraph>(maxCacheSize){
+                @Override
+                protected void entryRemoved(boolean evicted, Integer key, Paragraph oldValue, Paragraph newValue) {
+                    super.entryRemoved(evicted, key, oldValue, newValue);
+                    for(int i=0;i<oldValue.lineCount;i++){
+                        TextLine textLine = oldValue.textLines[i];
+                        textLine.recycler();
+                    }
+                }
+            };
         }
 
         /**
@@ -1477,13 +1486,6 @@ public class RecyclerStaticLayout extends Layout {
          */
         public void putParagraph(int index,Paragraph paragraph){
             this.paragraphArray.put(index,paragraph);
-            //清除外围多余的段落信息
-            int offset=1;
-            int itemCount=1;
-//            while(maxCacheSize>paragraphArray.size()){
-//                Paragraph paragraph1 = paragraphArray.get(index - offset);
-//                Paragraph paragraph2 = paragraphArray.get(index + offset);
-//            }
         }
 
         /**
@@ -1501,6 +1503,26 @@ public class RecyclerStaticLayout extends Layout {
          */
         public void setMaxCacheSize(int maxCacheSize) {
             this.maxCacheSize = maxCacheSize;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                paragraphArray.resize(maxCacheSize);
+            } else {
+                //reset the lru cache size. Because there was no resize function we can get in this version
+                Map<Integer, Paragraph> paragraphMap = paragraphArray.snapshot();
+                paragraphArray.evictAll();
+                paragraphArray=new LruCache<Integer,Paragraph>(maxCacheSize){
+                    @Override
+                    protected void entryRemoved(boolean evicted, Integer key, Paragraph oldValue, Paragraph newValue) {
+                        super.entryRemoved(evicted, key, oldValue, newValue);
+                        for(int i=0;i<oldValue.lineCount;i++){
+                            TextLine textLine = oldValue.textLines[i];
+                            textLine.recycler();
+                        }
+                    }
+                };
+                for(Map.Entry<Integer,Paragraph> entry:paragraphMap.entrySet()){
+                    paragraphArray.put(entry.getKey(),entry.getValue());
+                }
+            }
         }
     }
 

@@ -47,7 +47,11 @@ class TestLayoutSampleActivity : ToolBarActivity() {
 
     private fun appendTextSpan(spanIndex:Int){
         spanList.add(spanIndex)
-        val text= (0..spanList.size).joinToString(" ") { i -> Data.ITEMS[i] }
+        val text= (0..spanList.size).joinToString(" ") { i ->
+            val text=Data.ITEMS[i]
+            val index=text.indexOf(' ')
+            if(-1==index) text else text.substring(0,index)
+        }
         val spannableString=SpannableString(text)
         var start=-1
         for(index in spanList){

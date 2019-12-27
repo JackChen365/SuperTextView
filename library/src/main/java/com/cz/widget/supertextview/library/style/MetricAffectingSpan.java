@@ -6,9 +6,7 @@ import android.text.TextPaint;
  * The classes that affect character-level text formatting in a way that
  * changes the width or height of characters extend this class.
  */
-public abstract class MetricAffectingSpan
-extends CharacterStyle
-implements UpdateLayout {
+public abstract class MetricAffectingSpan extends CharacterStyle implements UpdateLayout {
 
 	public abstract void updateMeasureState(TextPaint p);
 
