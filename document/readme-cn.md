@@ -62,7 +62,7 @@ public class HighlightLineDecoration extends LineDecoration {
     }
 
     @Override
-    public void getParagraphLineOffsets(TextParagraph textParagraph, int line, Rect outRect) {
+    public void getParagraphLineOffsets(TextParagraph textLineSet, int line, Rect outRect) {
     //Here set offset for paragraph. If your line in the text pagraph. Since we support paragraph we have TextParagraph, It's more like View and ViewGroup 
         outRect.set(0,0,0,0);
 //        outRect.set(lineParagraphPadding,lineParagraphPadding,lineParagraphPadding,lineParagraphPadding);

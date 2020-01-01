@@ -18,34 +18,22 @@ public abstract class ReplacementSpan extends MetricAffectingSpan {
      */
     private static final int FLOW_FLAG=0x01;
     /**
-     * 当前元素独占一行
-     */
-    private static final int PARAGRAPH_FLAG = 0x02;
-    /**
      * 断行标志
      */
-    private static final int BREAK_LINE_FLAG = 0x04;
+    private static final int BREAK_LINE_FLAG = 0x02;
     /**
      * 检测是否需要断行,意思为超出内容则断,不超出不断
      */
-    private static final int CONSIDER_BREAK_LINE_FLAG = 0x08;
+    private static final int CONSIDER_BREAK_LINE_FLAG = 0x04;
     /**
      * 当前元素独占一行
      */
-    private static final int SINGLE_LINE_FLAG = 0x10;
+    private static final int SINGLE_LINE_FLAG = 0x8;
 
     /**
      * 跟随内容向右流动
      */
     public static final int FLOW=FLOW_FLAG;
-    /**
-     * 标记段落,后续内容按此段落信息流动
-     */
-    public static final int PARAGRAPH =PARAGRAPH_FLAG | CONSIDER_BREAK_LINE_FLAG;
-    /**
-     * 标记段落,并自动断行
-     */
-    public static final int PARAGRAPH_BREAK_LINE=PARAGRAPH_FLAG | BREAK_LINE_FLAG;
     /**
      * 遇到此控件自动换行
      */
@@ -85,13 +73,6 @@ public abstract class ReplacementSpan extends MetricAffectingSpan {
      */
     public static boolean considerBreakLine(int layoutMode){
         return 0!=(CONSIDER_BREAK_LINE_FLAG & layoutMode);
-    }
-
-    /**
-     * 该元素是否超出断行
-     */
-    public static boolean isParagraph(int layoutMode){
-        return 0!=(PARAGRAPH_FLAG & layoutMode);
     }
 
     public abstract int getSize(Paint paint, CharSequence text,

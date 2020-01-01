@@ -1053,7 +1053,7 @@ implements CharSequence, GetChars, Spannable, Editable, Appendable {
      * {@hide}
      */
     public float measureText(int start, int end, Paint p) {
-        checkRange("measureText", start, end);
+        checkRange("measureTextElement", start, end);
 
         float ret;
 

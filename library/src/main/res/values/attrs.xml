@@ -27,4 +27,17 @@
             <enum name="bottom" value="0x02"/>
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="TextParagraphLayout">
+        <attr name="paragraphGravity" format="enum">
+            <enum name="left" value="0x01"/>
+            <enum name="center" value="0x02"/>
+            <enum name="right" value="0x03"/>
+        </attr>
+        <attr name="layoutParagraphGravity" format="enum">
+            <enum name="left" value="0x01"/>
+            <enum name="center" value="0x02"/>
+            <enum name="right" value="0x03"/>
+        </attr>
+    </declare-styleable>
 </resources>

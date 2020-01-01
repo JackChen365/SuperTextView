@@ -4,13 +4,18 @@ package com.cz.widget.supertextview.library.layout;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.text.Spanned;
 import android.text.TextPaint;
 
 import com.cz.widget.supertextview.library.Styled;
-import com.cz.widget.supertextview.library.render.DefaultTextRender;
+import com.cz.widget.supertextview.library.decoration.LineDecoration;
+import com.cz.widget.supertextview.library.layout.adapter.DynamicTextLayoutAdapter;
+import com.cz.widget.supertextview.library.layout.adapter.TextLayoutAdapter;
+import com.cz.widget.supertextview.library.layout.adapter.SimpleTextLayoutAdapter;
 import com.cz.widget.supertextview.library.render.TextRender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -22,6 +27,9 @@ import com.cz.widget.supertextview.library.render.TextRender;
  */
 public abstract class Layout {
     private static final String TAG="Layout";
+    private static final Object LOCK=new Object();
+    final SimpleTextLayoutAdapter textLayoutAdapter;
+    List<DynamicTextLayoutAdapter> textLayoutAdapters=new ArrayList<>();
     CharSequence text;
     TextPaint paint;
     TextRender textRender;
@@ -39,20 +47,49 @@ public abstract class Layout {
      * @param width 排版宽
      * @param spacingAdd  行额外添加空间
      */
-    protected Layout(CharSequence text, TextPaint paint,
-                     TextRender textRender,int width, float spacingAdd) {
+    protected Layout(CharSequence text, TextPaint paint, LineDecoration lineDecoration,
+                     TextRender textRender, int width, float spacingAdd) {
         if (width < 0)
             throw new IllegalArgumentException("Layout: " + width + " < 0");
         this.text = text;
         this.paint = paint;
         this.workPaint = new TextPaint();
         this.fontMetricsInt = new Paint.FontMetricsInt();
+        this.textLayoutAdapter=new SimpleTextLayoutAdapter(lineDecoration);
         this.textRender=textRender;
         this.width = width;
         this.spacingAdd = spacingAdd;
         if(text instanceof Spanned)
             spanned = (Spanned) text;
         spannedText = text instanceof Spanned;
+    }
+
+    /**
+     * 注册文本布局适配器
+     * @param textLayoutAdapter
+     */
+    public void registerTextLayoutAdapter(DynamicTextLayoutAdapter textLayoutAdapter){
+        synchronized (LOCK){
+            textLayoutAdapters.add(textLayoutAdapter);
+        }
+    }
+
+    /**
+     * 解除一个布局适配器绑定
+     * @param textLayoutAdapter
+     */
+    public void unregisterTextLayoutAdapter(DynamicTextLayoutAdapter textLayoutAdapter){
+        synchronized (LOCK){
+            textLayoutAdapters.remove(textLayoutAdapter);
+        }
+    }
+
+    /**
+     * 获得所有注册的数据适配器
+     * @return
+     */
+    public List<DynamicTextLayoutAdapter> getTextLayoutAdapters() {
+        return textLayoutAdapters;
     }
 
     /**

@@ -3,8 +3,8 @@ package com.cz.widget.supertextview.library.decoration;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-import com.cz.widget.supertextview.library.text.TextLine;
-import com.cz.widget.supertextview.library.text.TextParagraph;
+import com.cz.widget.supertextview.library.text.TextElement;
+import com.cz.widget.supertextview.library.text.TextLayoutElement;
 
 /**
  * 默认的空的行装饰器
@@ -16,15 +16,15 @@ public class DefaultLineDecoration extends LineDecoration {
     }
 
     @Override
-    public void getParagraphLineOffsets(TextParagraph textParagraph, int line, Rect outRect) {
+    public void getParagraphLineOffsets(TextLayoutElement textLayoutElement, int line, Rect outRect) {
     }
 
     @Override
-    public void onLineDraw(Canvas canvas, TextLine textLine, int width) {
+    public void onLineDraw(Canvas canvas, TextElement textElement, int width) {
     }
 
     @Override
-    public void onParagraphLineDraw(Canvas canvas, TextLine textLine, int width) {
+    public void onParagraphLineDraw(Canvas canvas, TextElement textElement, int width) {
     }
 
 

@@ -15,9 +15,7 @@ public class Paragraph{
     /**
      * 段落内行信息
      */
-    public TextLine[] textLines;
-
-    public TextParagraph textParagraph;
+    public TextElement[] textLines;
 
     public Paragraph(int index) {
         this.index = index;

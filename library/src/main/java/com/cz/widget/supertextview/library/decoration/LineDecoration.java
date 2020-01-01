@@ -3,8 +3,8 @@ package com.cz.widget.supertextview.library.decoration;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-import com.cz.widget.supertextview.library.text.TextLine;
-import com.cz.widget.supertextview.library.text.TextParagraph;
+import com.cz.widget.supertextview.library.text.TextElement;
+import com.cz.widget.supertextview.library.text.TextLayoutElement;
 
 /**
  * 代码行装饰器
@@ -24,19 +24,19 @@ public abstract class LineDecoration {
      * 获得段落内条件偏移
      * @param outRect
      */
-    public abstract void getParagraphLineOffsets(TextParagraph textParagraph, int line, Rect outRect);
+    public abstract void getParagraphLineOffsets(TextLayoutElement textLayoutElement, int line, Rect outRect);
 
     /**
      * 行绘制信息
      * @param canvas
      */
-    public abstract void onLineDraw(Canvas canvas, TextLine textLine,int width);
+    public abstract void onLineDraw(Canvas canvas, TextElement textElement, int width);
 
     /**
      * 段落行绘制信息
      * @param canvas
      */
-    public abstract void onParagraphLineDraw(Canvas canvas, TextLine textLine,int width);
+    public abstract void onParagraphLineDraw(Canvas canvas,TextElement textElement,int width);
 
 
 }

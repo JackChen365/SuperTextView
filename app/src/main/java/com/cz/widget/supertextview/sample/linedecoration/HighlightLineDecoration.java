@@ -7,8 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
-import com.cz.widget.supertextview.library.text.TextLine;
-import com.cz.widget.supertextview.library.text.TextParagraph;
+import com.cz.widget.supertextview.library.text.TextElement;
+import com.cz.widget.supertextview.library.text.TextLayoutElement;
 import com.cz.widget.supertextview.sample.R;
 
 /**
@@ -40,32 +40,22 @@ public class HighlightLineDecoration extends LineDecoration {
     }
 
     @Override
-    public void getParagraphLineOffsets(TextParagraph textParagraph, int line, Rect outRect) {
+    public void getParagraphLineOffsets(TextLayoutElement textLayoutElement, int line, Rect outRect) {
         outRect.set(0,0,0,0);
 //        outRect.set(lineParagraphPadding,lineParagraphPadding,lineParagraphPadding,lineParagraphPadding);
     }
 
     @Override
-    public void onLineDraw(Canvas canvas, TextLine textLine,int width) {
-        int decoratedScrollLineBottom = textLine.getDecoratedScrollLineBottom();
+    public void onLineDraw(Canvas canvas, TextElement textElement, int width) {
+        int decoratedScrollLineBottom = textElement.getDecoratedScrollLineBottom();
         canvas.drawLine(0f,decoratedScrollLineBottom*1f, width,decoratedScrollLineBottom*1f, linePaint);
     }
 
     @Override
-    public void onParagraphLineDraw(Canvas canvas, TextLine textLine,int width) {
-        if(textLine.isBreakLine()){
-            //中间分隔线
-            int lineLeft = textLine.getDecoratedLeft();
-            int decoratedScrollLineBottom = textLine.getDecoratedScrollLineBottom();
-            canvas.drawLine(lineLeft,decoratedScrollLineBottom*1f, width,decoratedScrollLineBottom*1f, lineParagraphPaint);
-        }
-        //文本底部分隔线
-//        Rect decoratedRect = textLine.getDecoratedRect();
-//        int scrollOffset = textLine.getScrollOffset();
-//        int lineBottom = textLine.getLineBottom();
-//        canvas.drawLine(decoratedRect.left,scrollOffset+lineBottom*1f, width-decoratedRect.right,scrollOffset+lineBottom*1f,linePaint);
+    public void onParagraphLineDraw(Canvas canvas, TextElement textElement,int width) {
+        //中间分隔线
+        int lineLeft = textElement.getDecoratedLeft();
+        int decoratedScrollLineBottom = textElement.getDecoratedScrollLineBottom();
+        canvas.drawLine(lineLeft,decoratedScrollLineBottom*1f, width,decoratedScrollLineBottom*1f, lineParagraphPaint);
     }
-
-
-
 }
