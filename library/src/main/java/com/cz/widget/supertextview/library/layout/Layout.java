@@ -27,9 +27,7 @@ import java.util.List;
  */
 public abstract class Layout {
     private static final String TAG="Layout";
-    private static final Object LOCK=new Object();
-    final SimpleTextLayoutAdapter textLayoutAdapter;
-    List<DynamicTextLayoutAdapter> textLayoutAdapters=new ArrayList<>();
+    TextLayoutAdapter textLayoutAdapter;
     CharSequence text;
     TextPaint paint;
     TextRender textRender;
@@ -38,7 +36,6 @@ public abstract class Layout {
     int width;
     private float spacingAdd;
     private Spanned spanned;
-    private boolean spannedText;
 
     /**
      *
@@ -61,35 +58,23 @@ public abstract class Layout {
         this.spacingAdd = spacingAdd;
         if(text instanceof Spanned)
             spanned = (Spanned) text;
-        spannedText = text instanceof Spanned;
     }
 
     /**
-     * 注册文本布局适配器
+     * 设置文本布局适配器
      * @param textLayoutAdapter
      */
-    public void registerTextLayoutAdapter(DynamicTextLayoutAdapter textLayoutAdapter){
-        synchronized (LOCK){
-            textLayoutAdapters.add(textLayoutAdapter);
-        }
+    public void setTextLayoutAdapter(TextLayoutAdapter textLayoutAdapter){
+        this.textLayoutAdapter=textLayoutAdapter;
     }
 
-    /**
-     * 解除一个布局适配器绑定
-     * @param textLayoutAdapter
-     */
-    public void unregisterTextLayoutAdapter(DynamicTextLayoutAdapter textLayoutAdapter){
-        synchronized (LOCK){
-            textLayoutAdapters.remove(textLayoutAdapter);
-        }
-    }
 
     /**
-     * 获得所有注册的数据适配器
+     * 获得当前文本布局适配器
      * @return
      */
-    public List<DynamicTextLayoutAdapter> getTextLayoutAdapters() {
-        return textLayoutAdapters;
+    public TextLayoutAdapter getTextLayoutAdapter() {
+        return this.textLayoutAdapter;
     }
 
     /**

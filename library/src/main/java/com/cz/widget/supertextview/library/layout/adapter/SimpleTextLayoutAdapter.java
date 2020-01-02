@@ -6,7 +6,7 @@ import com.cz.widget.supertextview.library.layout.measurer.TextStyleLineMeasurer
 import com.cz.widget.supertextview.library.text.TextElement;
 import com.cz.widget.supertextview.library.view.TextParent;
 
-public class SimpleTextLayoutAdapter implements TextLayoutAdapter {
+public class SimpleTextLayoutAdapter extends TextLayoutAdapter {
     private final TextStyleLineMeasurer textStyleMeasurer;
     public SimpleTextLayoutAdapter(LineDecoration lineDecoration){
         textStyleMeasurer=new TextStyleLineMeasurer(lineDecoration);
@@ -17,13 +17,12 @@ public class SimpleTextLayoutAdapter implements TextLayoutAdapter {
     }
 
     @Override
-    public int measureText(TextParent textParent, TextMeasurerInfo textMeasurerInfo, int paragraph, int line) {
-        TextElement[] textElements = textStyleMeasurer.measureTextElement(textParent, textMeasurerInfo, paragraph, line);
-        int lineCount = textStyleMeasurer.getLineCount();
-        TextElement textElement = textElements[lineCount - 1];
-        int start = textMeasurerInfo.start;
-        int end = textElement.getLineEnd();
-        //获取使用的字符数量
-        return end-start;
+    public TextElement[] measureText(TextParent textParent, TextMeasurerInfo textMeasurerInfo, int paragraph, int line) {
+        return textStyleMeasurer.measureTextElement(textParent, textMeasurerInfo, paragraph, line);
+    }
+
+    @Override
+    public int nextMeasureTransition(int start) {
+        return 0;
     }
 }

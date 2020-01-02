@@ -15,6 +15,7 @@ import com.cz.widget.supertextview.library.layout.TextLayoutCallback;
 import com.cz.widget.supertextview.library.layout.measurer.TextLayoutMeasurer;
 import com.cz.widget.supertextview.library.layout.measurer.TextMeasurerInfo;
 import com.cz.widget.supertextview.library.text.TextElement;
+import com.cz.widget.supertextview.library.text.TextLayoutElement;
 import com.cz.widget.supertextview.library.view.TextParent;
 
 /**
@@ -126,7 +127,10 @@ public class TextParagraphLayout extends ViewGroup implements TextLayoutCallback
     @Override
     public TextElement onMeasureText(TextParent textParent, TextLayoutMeasurer textLayoutMeasurer, TextMeasurerInfo textMeasurerInfo, int paragraph, int line) {
         int childCount = getChildCount();
-        if(0 < childCount){
+        TextLayoutElement textLayoutElement;
+        if(0 == childCount){
+            throw new NullPointerException("TextParagraphLayout should have at least one child!");
+        } else {
             View childView = getChildAt(0);
             int gravity = getViewGravity(childView);
             int width = getWidth();
@@ -135,28 +139,55 @@ public class TextParagraphLayout extends ViewGroup implements TextLayoutCallback
             int decorateLeft = getDecorateLeft(childView);
             int decorateRight = getDecorateRight(childView);
             //layout child view
+            textLayoutElement=new TextLayoutElement();
             switch (gravity){
                 case LEFT:
                     //text layout rectangle area was decorate right to layout right
                     // from decorateLeft to right
-
+                    textLayoutElement.textElements=textLayoutMeasurer.measureTextElement(textParent, textMeasurerInfo, paragraph, line, decorateLeft, right,true);
+                    textLayoutElement.lineCount=textLayoutElement.textElements.length;
                     break;
                 case CENTER:
                     //if view in center of the layout. Therefore, It will split paragraph to two different area
                     // from left to decorateLeft, from decorateRight to right
+                    TextElement[] leftTextElements = textLayoutMeasurer.measureTextElement(textParent, textMeasurerInfo, paragraph, line, left, decorateLeft,true);
+                    TextElement[] rightTextElements = textLayoutMeasurer.measureTextElement(textParent, textMeasurerInfo, paragraph, line, decorateRight, right,true);
+                    int textLayoutCount = leftTextElements.length + rightTextElements.length;
+                    textLayoutElement.textElements=new TextElement[textLayoutCount];
+                    System.arraycopy(leftTextElements,0,textLayoutElement.textElements,0,leftTextElements.length);
+                    System.arraycopy(rightTextElements,0,textLayoutElement.textElements,leftTextElements.length,rightTextElements.length);
                     break;
                 case RIGHT:
                     //if view in right of the layout. layout view from left to decorateLeft
+                    textLayoutElement.textElements=textLayoutMeasurer.measureTextElement(textParent,textMeasurerInfo,paragraph,line,left,decorateLeft,true);
+                    textLayoutElement.lineCount=textLayoutElement.textElements.length;
                     break;
             }
         }
-        return new TextElement();
+        return textLayoutElement;
     }
 
     @Override
     public boolean onGenerateTextElement(TextElement textElement) {
-        //排版靠近边缘,且内容靠底部时.结束排版
-        return false;
+        //when the text element near the edge and at the bottom of the view. Function return true to let outside know we are done
+        boolean done=true;
+        int childCount = getChildCount();
+        if(0 == childCount){
+            throw new NullPointerException("TextParagraphLayout should have at least one child!");
+        } else {
+            View childView = getChildAt(0);
+            int gravity = getViewGravity(childView);
+            //If the view in center of the layout. That's mean we will have two different area of text.
+            //So I have to make sure that this text element is in right side of the layout
+            if(CENTER==gravity){
+                int decorateRight = getDecorateRight(childView);
+                done=decorateRight<=textElement.getLineLeft();
+            }
+            int decoratedLineBottom = textElement.getDecoratedLineBottom();
+            int measuredHeight = getMeasuredHeight();
+            done &= decoratedLineBottom>=measuredHeight;
+        }
+        return done;
     }
 
 

@@ -361,7 +361,7 @@ public class Styled
      * @param start
      * @param end
      */
-    public static void onTextLineRemoved(TextRender textRender, CharSequence text, int start, int end){
+    public static void onTextElementRemoved(TextRender textRender, CharSequence text, int start, int end){
         Spanned spanned=(Spanned)text;
         int next;
         int from=start;

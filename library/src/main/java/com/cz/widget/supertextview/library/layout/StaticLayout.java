@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
+import com.cz.widget.supertextview.library.text.TextElement;
 import com.cz.widget.supertextview.library.text.TextLine;
 import com.cz.widget.supertextview.library.utils.ArrayUtils;
 import com.cz.widget.supertextview.library.view.TextParent;
@@ -28,7 +29,7 @@ public class StaticLayout extends Layout {
     private int lineCount;
 
     //当前展示行信息
-    private TextLine[] textLines;
+    private TextElement[] textElements;
     private char[] charArrays;
     private float[] widths;
     //行装饰器
@@ -90,8 +91,8 @@ public class StaticLayout extends Layout {
             if (end == bufferEnd)
                 break;
         }
-        textLines= textLineList.toArray(new TextLine[textLineList.size()]);
-        lineCount=textLines.length;
+        textElements = textLineList.toArray(new TextLine[textLineList.size()]);
+        lineCount= textElements.length;
     }
 
     /**
@@ -145,45 +146,45 @@ public class StaticLayout extends Layout {
     }
 
     public int getDecoratedScrollLineTop(int line) {
-        return textLines[line].getDecoratedLineTop();
+        return textElements[line].getDecoratedLineTop();
     }
 
     @Override
     public int getDecoratedScrollLineBottom(int line) {
-        return textLines[line].getDecoratedLineBottom();
+        return textElements[line].getDecoratedLineBottom();
     }
 
     @Override
     public int getScrollLineTop(int line) {
-        return textLines[line].getScrollTop();
+        return textElements[line].getScrollTop();
     }
 
     @Override
     public int getScrollLineBottom(int line) {
-        return textLines[line].getScrollBottom();
+        return textElements[line].getScrollBottom();
     }
 
     public int getDecoratedDescent(int line) {
-        return textLines[line].getScrollDescent();
+        return textElements[line].getScrollDescent();
     }
 
     @Override
     public int getLineStart(int line) {
-        return textLines[line].getLineStart();
+        return textElements[line].getLineStart();
     }
 
     @Override
     public int getLineGravity(int line) {
-        return textLines[line].getLineAlign();
+        return textElements[line].getLineAlign();
     }
 
     public int getLineLatterStart(int line) {
-        return textLines[line].getLineStart();
+        return textElements[line].getLineStart();
     }
 
     @Override
     public int getLineLatterEnd(int line) {
-        return textLines[line].getLineEnd();
+        return textElements[line].getLineEnd();
     }
 
 
@@ -196,7 +197,7 @@ public class StaticLayout extends Layout {
         if(0 < lineCount){
             TextRender textRender = getTextRender();
             for(int i=0;i<lineCount;i++){
-                TextLine textLine = textLines[i];
+                TextElement textLine = textElements[i];
                 //绘制行信息
                 textLine.draw(c,textRender,text,paint,workPaint,fontMetricsInt,width,true);
             }

@@ -13,11 +13,13 @@ import com.cz.widget.supertextview.library.Styled;
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
 import com.cz.widget.supertextview.library.layout.adapter.DynamicTextLayoutAdapter;
 import com.cz.widget.supertextview.library.layout.adapter.TextLayoutAdapter;
+import com.cz.widget.supertextview.library.layout.measurer.TextMeasurerInfo;
 import com.cz.widget.supertextview.library.render.TextRender;
 import com.cz.widget.supertextview.library.span.ViewSpan;
 import com.cz.widget.supertextview.library.style.ReplacementSpan;
 import com.cz.widget.supertextview.library.text.Paragraph;
 import com.cz.widget.supertextview.library.text.TextElement;
+import com.cz.widget.supertextview.library.text.TextLayoutElement;
 import com.cz.widget.supertextview.library.text.TextLine;
 import com.cz.widget.supertextview.library.text.TextParagraph;
 import com.cz.widget.supertextview.library.utils.ArrayUtils;
@@ -57,7 +59,7 @@ public class RecyclerStaticLayout extends Layout {
     private int textAlign;
 
     //当前展示行信息
-    private TextLine[] textLines;
+    private TextElement[] textElements;
     //段落回收信息
     private ParagraphRecyclerPool recyclerPool=new ParagraphRecyclerPool();
     //行装饰器
@@ -89,7 +91,7 @@ public class RecyclerStaticLayout extends Layout {
         this.textAlign = textAlign;
         this.textRender=textRender;
         this.lineDecoration=lineDecoration;
-        this.textLines = new TextLine[3];
+        this.textElements = new TextLine[3];
         //初始化LayoutState状态
         updateLayoutStateFromEnd(height);
         //填空文本
@@ -118,7 +120,20 @@ public class RecyclerStaticLayout extends Layout {
     Paragraph fillParagraphText(int index,CharSequence source, int bufferStart, int bufferEnd,
                                 TextPaint paint, int outerWidth,int v, float spacingAdd, int align) {
         Paragraph paragraph=new Paragraph(index);
-        List<DynamicTextLayoutAdapter> textLayoutAdapters = getTextLayoutAdapters();
+        TextParent textParent = textRender.getTarget();
+        TextMeasurerInfo textMeasurerInfo = TextMeasurerInfo.obtain();
+        textMeasurerInfo.source=source;
+        textMeasurerInfo.paint=paint;
+        textMeasurerInfo.workPaint=workPaint;
+        textMeasurerInfo.outerWidth=outerWidth;
+        textMeasurerInfo.top=v;
+        textMeasurerInfo.start=bufferStart;
+        textMeasurerInfo.end=bufferEnd;
+        textMeasurerInfo.align=align;
+        //初始化文本元素
+        TextElement[] textElements = textLayoutAdapter.measureText(textParent, textMeasurerInfo, index, 0);
+        paragraph.textLines=textElements;
+        paragraph.lineCount=textElements.length;
         return paragraph;
     }
 
@@ -178,7 +193,7 @@ public class RecyclerStaticLayout extends Layout {
         this.height=outerHeight;
         //清除当前信息,但保存数组
         lineCount=0;
-        Arrays.fill(textLines,0, textLines.length,null);
+        Arrays.fill(textElements,0, textElements.length,null);
         //清空当前视图所有控件
         TextParent textParent = textRender.getTarget();
         textParent.detachAllViewsFromParent();
@@ -233,7 +248,7 @@ public class RecyclerStaticLayout extends Layout {
         scrollY+=offset;
         int lineCount = getLineCount();
         for(int line=0;line<lineCount;line++){
-            textLines[line].setScrollOffset(scrollY);
+            textElements[line].setScrollOffset(scrollY);
         }
         //查找所有的view,偏移控件
         if(source instanceof Spanned){
@@ -381,7 +396,7 @@ public class RecyclerStaticLayout extends Layout {
         ensureTextLineArray();
         //向上填空行信息
         int off = 0;
-        TextLine[] lines = this.textLines;
+        TextElement[] lines = this.textElements;
         int firstLineTop = lines[off].getDecoratedLineTop();
         //1. 先将数组拷贝,所有元素向后移动一个单元-columns
         System.arraycopy(lines,off,lines,1,lines.length-1);
@@ -407,7 +422,7 @@ public class RecyclerStaticLayout extends Layout {
         int index=0 > line-1 ? 0 : line-1;
         if(index<lineCount){
             //根据位置获得移动底部位置
-            lineBottom=textLines[index].getDecoratedLineBottom();
+            lineBottom= textElements[index].getDecoratedLineBottom();
         }
         return lineBottom;
     }
@@ -420,7 +435,7 @@ public class RecyclerStaticLayout extends Layout {
         ensureTextLineArray();
         //向下填空行信息
         int line = lineCount;
-        TextLine[] lines = this.textLines;
+        TextElement[] lines = this.textElements;
         //获得上一行底部底部排版位置,累加
         int lineTop = getLineBottomFromEnd(line);
         System.arraycopy(paragraph.textLines,paragraphLine,lines,line,1);
@@ -442,16 +457,16 @@ public class RecyclerStaticLayout extends Layout {
     /**
      * 填空指定行信息
      */
-    protected void onNewTextLineFilled(TextLine textLine){
+    protected void onNewTextLineFilled(TextElement textElement){
         //排版子控件
         TextParent target = textRender.getTarget();
-        textLine.layoutViewSpan(target,source,0,0);
+        textElement.layoutViewSpan(target,source,0,0);
         //回调文本渲染
-        if(textLine instanceof TextParagraph){
-            TextParagraph textParagraph = (TextParagraph) textLine;
-            int paragraphLineTop = textLine.getDecoratedScrollLineTop();
-            for(int i = 0; i< textParagraph.lineCount; i++){
-                TextLine paragraphTextLine = textParagraph.textLines[i];
+        if(textElement instanceof TextParagraph){
+            TextLayoutElement textLayoutElement = (TextLayoutElement) textElement;
+            int paragraphLineTop = textElement.getDecoratedScrollLineTop();
+            for(int i = 0; i< textLayoutElement.lineCount; i++){
+                TextElement paragraphTextLine = textLayoutElement.textElements[i];
                 int lineStart = paragraphTextLine.getLineStart();
                 int lineEnd = paragraphTextLine.getLineEnd();
                 int lineLeft = paragraphTextLine.getLineLeft();
@@ -462,12 +477,12 @@ public class RecyclerStaticLayout extends Layout {
             }
         } else {
             //移除文本信息
-            int lineStart = textLine.getLineStart();
-            int lineEnd = textLine.getLineEnd();
-            int lineLeft = textLine.getLineLeft();
-            int lineTop = textLine.getDecoratedScrollLineTop();
-            int lineBottom = textLine.getDecoratedScrollLineBottom();
-            int lineAlign = textLine.getLineAlign();
+            int lineStart = textElement.getLineStart();
+            int lineEnd = textElement.getLineEnd();
+            int lineLeft = textElement.getLineLeft();
+            int lineTop = textElement.getDecoratedScrollLineTop();
+            int lineBottom = textElement.getDecoratedScrollLineBottom();
+            int lineAlign = textElement.getLineAlign();
             Styled.onTextLineAdded(textRender,paint,workPaint,fontMetricsInt,source,lineStart,lineEnd,lineLeft,lineTop,lineBottom,lineAlign);
         }
     }
@@ -478,12 +493,12 @@ public class RecyclerStaticLayout extends Layout {
     private void ensureTextLineArray(){
         int line = lineCount;
         int want = line + 1;
-        TextLine[] textLines = this.textLines;
-        if (want >= textLines.length) {
-            int nlen = ArrayUtils.idealIntArraySize(want + 1);
-            TextLine[] grow = new TextLine[nlen];
-            System.arraycopy(textLines, 0, grow, 0, textLines.length);
-            this.textLines = grow;
+        TextElement[] textElements = this.textElements;
+        if (want >= textElements.length) {
+            int len = ArrayUtils.idealIntArraySize(want + 1);
+            TextLine[] grow = new TextLine[len];
+            System.arraycopy(textElements, 0, grow, 0, textElements.length);
+            this.textElements = grow;
         }
     }
 
@@ -513,7 +528,7 @@ public class RecyclerStaticLayout extends Layout {
             int lineBottom = getDecoratedScrollLineBottom(i);
             if (lineBottom > dt) {// stop here
                 for (int line=0;line < i;line++) {
-                    removeTextLineFromStart(0);
+                    removeTextElementFromStart(0);
                 }
                 break;
             }
@@ -534,7 +549,7 @@ public class RecyclerStaticLayout extends Layout {
             int lineTop = getDecoratedScrollLineTop(i);
             if (lineTop < limit) {// stop here
                 for (int line=lineCount - 1;line>i;line--) {
-                    removeTextLineFromEnd(getLineCount()-1);
+                    removeTextElementFromEnd(getLineCount()-1);
                 }
                 break;
             }
@@ -544,22 +559,22 @@ public class RecyclerStaticLayout extends Layout {
     /**
      * Remove a specific line information from line origin array
      */
-    void removeTextLineFromStart(int index) {
-        removeTextLineAt(index);
+    void removeTextElementFromStart(int index) {
+        removeTextElementAt(index);
         //回收行信息
-        textLines[index]=null;
-        System.arraycopy(textLines,1, textLines,index, textLines.length-1);
+        textElements[index]=null;
+        System.arraycopy(textElements,1, textElements,index, textElements.length-1);
         lineCount--;
     }
 
     /**
      * Remove a specific line information from line origin array
      */
-    void removeTextLineFromEnd(int index) {
-        removeTextLineAt(index);
-        TextLine textLine = textLines[index];
-        TextLine.recycle(textLine);
-        textLines[index]=null;
+    void removeTextElementFromEnd(int index) {
+        removeTextElementAt(index);
+        TextElement textElement = textElements[index];
+        TextElement.recycle(textElement);
+        textElements[index]=null;
         lineCount--;
     }
 
@@ -567,22 +582,22 @@ public class RecyclerStaticLayout extends Layout {
      * 移除指定行特殊span位置
      * @param index
      */
-    private void removeTextLineAt(int index) {
+    private void removeTextElementAt(int index) {
         //渲染通知停止
-        TextLine textLine = textLines[index];
-        int lineLatterStart = textLine.getLineStart();
-        int lineLatterEnd = textLine.getLineEnd();
-        if(textLine instanceof TextParagraph){
-            TextParagraph textParagraph = (TextParagraph) textLine;
-            for(int i = 0; i< textParagraph.lineCount; i++){
-                TextLine paragraphTextLine = textParagraph.textLines[i];
-                int paragraphTextStart = paragraphTextLine.getLineStart();
-                int paragraphTextEnd = paragraphTextLine.getLineEnd();
-                Styled.onTextLineRemoved(textRender,source,paragraphTextStart,paragraphTextEnd);
+        TextElement textElement = textElements[index];
+        int lineLatterStart = textElement.getLineStart();
+        int lineLatterEnd = textElement.getLineEnd();
+        if(textElement instanceof TextLayoutElement){
+            TextLayoutElement textLayoutElement = (TextLayoutElement) textElement;
+            for(int i = 0; i< textLayoutElement.lineCount; i++){
+                TextElement paragraphTextElement = textLayoutElement.textElements[i];
+                int paragraphTextStart = paragraphTextElement.getLineStart();
+                int paragraphTextEnd = paragraphTextElement.getLineEnd();
+                Styled.onTextElementRemoved(textRender,source,paragraphTextStart,paragraphTextEnd);
             }
         } else {
             //移除文本信息
-            Styled.onTextLineRemoved(textRender,source,lineLatterStart,lineLatterEnd);
+            Styled.onTextElementRemoved(textRender,source,lineLatterStart,lineLatterEnd);
         }
         //移除viewSpan
         if(source instanceof Spanned){
@@ -660,53 +675,53 @@ public class RecyclerStaticLayout extends Layout {
 
     @Override
     public int getDecoratedScrollLineTop(int line) {
-        return textLines[line].getDecoratedScrollLineTop();
+        return textElements[line].getDecoratedScrollLineTop();
     }
 
     @Override
     public int getDecoratedScrollLineBottom(int line) {
-        return textLines[line].getDecoratedScrollLineBottom();
+        return textElements[line].getDecoratedScrollLineBottom();
     }
 
     @Override
     public int getScrollLineTop(int line) {
-        return textLines[line].getScrollTop();
+        return textElements[line].getScrollTop();
     }
 
     @Override
     public int getScrollLineBottom(int line) {
-        return textLines[line].getScrollBottom();
+        return textElements[line].getScrollBottom();
     }
 
     private int getLineTop(int line) {
-        return textLines[line].getLineTop();
+        return textElements[line].getLineTop();
     }
 
     private int getLineBottom(int line) {
-        return textLines[line].getLineBottom();
+        return textElements[line].getLineBottom();
     }
 
     public int getDecoratedDescent(int line) {
-        return textLines[line].getScrollDescent();
+        return textElements[line].getScrollDescent();
     }
 
     @Override
     public int getLineStart(int line) {
-        return textLines[line].getLineLeft();
+        return textElements[line].getLineLeft();
     }
 
     @Override
     public int getLineGravity(int line) {
-        return textLines[line].getLineAlign();
+        return textElements[line].getLineAlign();
     }
 
     public int getLineLatterStart(int line) {
-        return textLines[line].getLineStart();
+        return textElements[line].getLineStart();
     }
 
     @Override
     public int getLineLatterEnd(int line) {
-        return textLines[line].getLineEnd();
+        return textElements[line].getLineEnd();
     }
 
     /**
@@ -714,7 +729,7 @@ public class RecyclerStaticLayout extends Layout {
      * @param line
      */
     private int getParagraphIndex(int line) {
-        return textLines[line].getParagraph();
+        return textElements[line].getParagraph();
     }
 
     /**
@@ -722,7 +737,7 @@ public class RecyclerStaticLayout extends Layout {
      * @param line
      */
     private int getParagraphLine(int line) {
-        return textLines[line].getParagraphLine();
+        return textElements[line].getParagraphLine();
     }
 
     /**
@@ -736,13 +751,13 @@ public class RecyclerStaticLayout extends Layout {
     public int getOffsetForHorizontal(float x, float y) {
         int index;
         int line = getLineForVertical((int) y);
-        TextLine textLine = textLines[line];
-        if(!(textLine instanceof TextParagraph)){
+        TextElement textElement = textElements[line];
+        if(!(textElement instanceof TextLayoutElement)){
             index = super.getOffsetForHorizontal(x,y);
         } else {
-            TextParagraph textParagraph = (TextParagraph) textLine;
-            int textParagraphLine = getTextLineForVertical(textParagraph, (int) y);
-            index = getTextLineOffsetForHorizontal(textParagraph, textParagraphLine, x);
+            TextLayoutElement textLayoutElement = (TextLayoutElement) textElement;
+            int textParagraphLine = getTextLineForVertical(textLayoutElement, (int) y);
+            index = getTextLineOffsetForHorizontal(textLayoutElement, textParagraphLine, x);
         }
         return index;
     }
@@ -752,11 +767,11 @@ public class RecyclerStaticLayout extends Layout {
      * @param vertical 纵轨位置
      * @return
      */
-    private int getTextLineForVertical(TextParagraph textParagraph, int vertical) {
-        int high = textParagraph.getLineCount(), low = -1, guess;
+    private int getTextLineForVertical(TextLayoutElement textLayoutElement, int vertical) {
+        int high = textLayoutElement.getLineCount(), low = -1, guess;
         while (high - low > 1) {
             guess = (high + low) / 2;
-            if (textParagraph.getDecoratedScrollLineTop(guess) > vertical)
+            if (textLayoutElement.getDecoratedScrollLineTop(guess) > vertical)
                 high = guess;
             else
                 low = guess;
@@ -772,13 +787,13 @@ public class RecyclerStaticLayout extends Layout {
      * If you ask for a position before 0, you get 0; if you ask for a position
      * beyond the end of the text, you get the last line.
      */
-    private int getTextLineForOffset(TextParagraph textParagraph, int offset) {
-        int high = textParagraph.getLineCount(), low = -1, guess;
+    private int getTextLineForOffset(TextLayoutElement textLayoutElement, int offset) {
+        int high = textLayoutElement.getLineCount(), low = -1, guess;
 
         while (high - low > 1) {
             guess = (high + low) / 2;
 
-            if (textParagraph.getLineLatterStart(guess) > offset)
+            if (textLayoutElement.getLineLatterStart(guess) > offset)
                 high = guess;
             else
                 low = guess;
@@ -794,11 +809,11 @@ public class RecyclerStaticLayout extends Layout {
      * Get the character offset on the specfied line whose position is
      * closest to the specified horizontal position.
      */
-    private int getTextLineOffsetForHorizontal(TextParagraph textParagraph, int line, float offset) {
+    private int getTextLineOffsetForHorizontal(TextLayoutElement textLayoutElement, int line, float offset) {
         int index=-1;
-        int start = textParagraph.getLineLatterStart(line);
-        int end = textParagraph.getLineLatterEnd(line);
-        float x= textParagraph.getLineLeft(line);
+        int start = textLayoutElement.getLineLatterStart(line);
+        int end = textLayoutElement.getLineLatterEnd(line);
+        float x= textLayoutElement.getLineLeft(line);
         //如果初始超出,可能代表左侧有内容,需要往前检测
         if(offset > x){
             for (int i = start; i < end; i++) {
@@ -826,15 +841,15 @@ public class RecyclerStaticLayout extends Layout {
         int latterEnd;
         int paragraphLine=0;
         int line=getLineForOffset(start);
-        TextLine textLine = textLines[line];
-        if(textLine instanceof TextParagraph){
-            TextParagraph textParagraph = (TextParagraph) textLine;
-            paragraphLine = getTextLineForOffset(textParagraph, start);
-            lineLeft= textParagraph.getLineLeft(paragraphLine);
-            lineTop = textParagraph.getDecoratedScrollLineTop(paragraphLine);
-            lineBottom = textParagraph.getDecoratedScrollLineBottom(paragraphLine);
-            latterStart = textParagraph.getLineLatterStart(paragraphLine);
-            latterEnd = textParagraph.getLineLatterEnd(paragraphLine);
+        TextElement textElement = textElements[line];
+        if(textElement instanceof TextLayoutElement){
+            TextLayoutElement textLayoutElement = (TextLayoutElement) textElement;
+            paragraphLine = getTextLineForOffset(textLayoutElement, start);
+            lineLeft= textLayoutElement.getLineLeft(paragraphLine);
+            lineTop = textLayoutElement.getDecoratedScrollLineTop(paragraphLine);
+            lineBottom = textLayoutElement.getDecoratedScrollLineBottom(paragraphLine);
+            latterStart = textLayoutElement.getLineLatterStart(paragraphLine);
+            latterEnd = textLayoutElement.getLineLatterEnd(paragraphLine);
         } else {
             lineLeft=0;
             lineTop = getDecoratedScrollLineTop(line);
@@ -850,29 +865,29 @@ public class RecyclerStaticLayout extends Layout {
             if(latterEnd <= i){
                 x=0;
                 boolean moveToNextTextLine=true;
-                if(textLine instanceof TextParagraph){
+                if(textElement instanceof TextLayoutElement){
                     paragraphLine++;
-                    TextParagraph textParagraph = (TextParagraph) textLine;
-                    if(paragraphLine< textParagraph.lineCount){
+                    TextLayoutElement textLayoutElement = (TextLayoutElement) textElement;
+                    if(paragraphLine< textLayoutElement.lineCount){
                         //段落平移
                         moveToNextTextLine=false;
-                        lineLeft= textParagraph.getLineLeft(paragraphLine);
-                        lineTop = textParagraph.getDecoratedScrollLineTop(paragraphLine);
-                        lineBottom = textParagraph.getDecoratedScrollLineBottom(paragraphLine);
-                        latterEnd = textParagraph.getLineLatterEnd(paragraphLine);
+                        lineLeft= textLayoutElement.getLineLeft(paragraphLine);
+                        lineTop = textLayoutElement.getDecoratedScrollLineTop(paragraphLine);
+                        lineBottom = textLayoutElement.getDecoratedScrollLineBottom(paragraphLine);
+                        latterEnd = textLayoutElement.getLineLatterEnd(paragraphLine);
                     }
                 }
                 //行平移
                 if(moveToNextTextLine){
                     paragraphLine=0;
-                    textLine = textLines[++line];
-                    if(textLine instanceof TextParagraph){
-                        TextParagraph textParagraph = (TextParagraph) textLine;
-                        paragraphLine = getTextLineForOffset(textParagraph, start);
-                        lineLeft= textParagraph.getLineLeft(paragraphLine);
-                        lineTop = textParagraph.getDecoratedScrollLineTop(paragraphLine);
-                        lineBottom = textParagraph.getDecoratedScrollLineBottom(paragraphLine);
-                        latterEnd = textParagraph.getLineLatterEnd(paragraphLine);
+                    textElement = textElements[++line];
+                    if(textElement instanceof TextLayoutElement){
+                        TextLayoutElement textLayoutElement = (TextLayoutElement) textElement;
+                        paragraphLine = getTextLineForOffset(textLayoutElement, start);
+                        lineLeft= textLayoutElement.getLineLeft(paragraphLine);
+                        lineTop = textLayoutElement.getDecoratedScrollLineTop(paragraphLine);
+                        lineBottom = textLayoutElement.getDecoratedScrollLineBottom(paragraphLine);
+                        latterEnd = textLayoutElement.getLineLatterEnd(paragraphLine);
                     } else {
                         lineLeft=0;
                         lineTop = getDecoratedScrollLineTop(line);
@@ -896,9 +911,9 @@ public class RecyclerStaticLayout extends Layout {
         if(0 < lineCount){
             TextRender textRender = getTextRender();
             for(int i=0;i<lineCount;i++){
-                TextLine textLine = textLines[i];
+                TextElement textElement = textElements[i];
                 //绘制行信息
-                textLine.draw(c,textRender,source,paint,workPaint,fontMetricsInt,width,true);
+                textElement.draw(c,textRender,source,paint,workPaint,fontMetricsInt,width,true);
             }
         }
         //绘制其他元素

@@ -198,7 +198,7 @@ public abstract class TextElementMeasurer {
      * @param end
      * @return
      */
-    public int getNextTransition(Spanned spanned, int i,int end) {
+    public int getNextTransition(Spanned spanned, int i,int end,boolean textLayout) {
         int next=0;
         if (spanned == null) {
             int textCount=end-i;
@@ -207,9 +207,11 @@ public abstract class TextElementMeasurer {
             } else {
                 next = end;
             }
-        } else {
+        } else if(textLayout){
+            //if the process of measure in text layout.that's mean We don't have to measure to much
+            //cause if the size over the layout. we will change it to other measurer.
             int nextSpanTransition = spanned.nextSpanTransition(i, end, MetricAffectingSpan.class);
-            //todo  try to save this step, cause it hard to know next span transition was start or end;
+            //todo  try to remove this step, cause it hard to know next span transition was start or end;
             MetricAffectingSpan[] spans = spanned.getSpans(i, nextSpanTransition, MetricAffectingSpan.class);
             if(0 < spans.length){
                 next=nextSpanTransition;
@@ -221,6 +223,8 @@ public abstract class TextElementMeasurer {
                     next = end;
                 }
             }
+        } else {
+            next = spanned.nextSpanTransition(i, end, MetricAffectingSpan.class);
         }
         return next;
     }

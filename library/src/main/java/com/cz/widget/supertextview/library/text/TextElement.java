@@ -17,6 +17,7 @@ import com.cz.widget.supertextview.library.view.TextParent;
  * 文本元素,扩展所有界面文本绘制信息
  */
 public class TextElement {
+    public static final TextElement[] EMPTY_ARRAY=new TextElement[0];
     /**
      * 移动偏移
      */

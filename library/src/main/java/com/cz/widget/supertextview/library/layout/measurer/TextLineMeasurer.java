@@ -6,7 +6,6 @@ import android.text.Spanned;
 import android.text.TextPaint;
 
 import com.cz.widget.supertextview.library.decoration.LineDecoration;
-import com.cz.widget.supertextview.library.style.MetricAffectingSpan;
 import com.cz.widget.supertextview.library.text.TextElement;
 import com.cz.widget.supertextview.library.utils.ArrayUtils;
 import com.cz.widget.supertextview.library.utils.TextUtilsCompat;
@@ -46,15 +45,16 @@ public abstract class TextLineMeasurer extends TextElementMeasurer{
 
     @Override
     public TextElement[] measureTextElement(TextParent textParent, TextMeasurerInfo textMeasurerInfo, int paragraph, int line){
-        return measureTextElement(textParent,textMeasurerInfo,paragraph,line,0,textMeasurerInfo.outerWidth);
+        return measureTextElement(textParent,textMeasurerInfo,paragraph,line,0,textMeasurerInfo.outerWidth,false);
     }
 
     /**
      * 填空段落信息
      * @param textMeasurerInfo
+     * @param textLayout 如果在文本布局内,则需要尽量减少运算量,因为超出布局即可停止.如果按段落运算.此时运算量会很大.
      * @return
      */
-    protected TextElement[] measureTextElement(TextParent textParent, TextMeasurerInfo textMeasurerInfo, int paragraph, int line, int left, int right) {
+    public TextElement[] measureTextElement(TextParent textParent, TextMeasurerInfo textMeasurerInfo, int paragraph, int line, int left, int right,boolean textLayout) {
         TextElement[] textElementArray=idealTextElementArray(null,lineCount);
         CharSequence source = textMeasurerInfo.source;
         TextPaint workPaint = textMeasurerInfo.workPaint;
@@ -82,7 +82,7 @@ public abstract class TextLineMeasurer extends TextElementMeasurer{
         boolean stopMeasure=false;
         for (int i = start; i < end; i = next) {
             //获得下一个流转的位置
-            next = getNextTransition(spanned, i,end);
+            next = getNextTransition(spanned, i,end,textLayout);
             if (null==charArrays||end - start > chs.length) {
                 chs = new char[ArrayUtils.idealCharArraySize(end - start)];
                 charArrays = chs;
@@ -174,9 +174,10 @@ public abstract class TextLineMeasurer extends TextElementMeasurer{
                     ok = here;
                     w = left+decorationRect.left;
                 }
-                if(stopMeasure) break;
+                if(stopMeasure) {
+                    break;
+                }
             }
-            if(stopMeasure) break;
         }
         if (!stopMeasure && (end != here||start==end && '\n'==source.charAt(end-1))) {
             //处理断行内容
